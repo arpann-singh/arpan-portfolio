@@ -8,6 +8,7 @@ import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, setD
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { motion, AnimatePresence } from "framer-motion";
 import { LogOut, Inbox, LayoutGrid, ShieldCheck, Loader2, Trash2, CheckCircle, FileText, PieChart, Wrench, Image as ImageIcon, Plus, Layout, Edit3, X, UploadCloud, Award } from "lucide-react";
+import GalleryManager from "@/components/admin/GalleryManager";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -19,7 +20,7 @@ export default function Dashboard() {
   const [skills, setSkills] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [certs, setCerts] = useState<any[]>([]);
-  
+
   // --- HERO CMS STATE ---
   const [isUpdatingHero, setIsUpdatingHero] = useState(false);
   const [heroData, setHeroData] = useState({
@@ -27,7 +28,7 @@ export default function Dashboard() {
     card2: { text: "🎭 Swaang", url: "" },
     card3: { text: "🚀 GDSC", url: "" }
   });
-  const [heroFiles, setHeroFiles] = useState({ card1: null as File|null, card2: null as File|null, card3: null as File|null });
+  const [heroFiles, setHeroFiles] = useState({ card1: null as File | null, card2: null as File | null, card3: null as File | null });
 
   // --- MODAL & EDIT STATES ---
   const [editProject, setEditProject] = useState<any>(null);
@@ -46,7 +47,7 @@ export default function Dashboard() {
       else {
         setIsLoading(false);
         fetchSettings();
-        
+
         // Listeners for Data
         const unsubMsg = onSnapshot(query(collection(db, "messages"), orderBy("createdAt", "desc")), snap => setMessages(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
         const unsubSkills = onSnapshot(query(collection(db, "skills"), orderBy("category")), snap => setSkills(snap.docs.map(d => ({ id: d.id, ...d.data() }))));
@@ -96,15 +97,15 @@ export default function Dashboard() {
       setHeroData(updatedHeroData);
       setHeroFiles({ card1: null, card2: null, card3: null });
       alert("Hero section updated!");
-    } catch (err) { alert("Failed to update."); } 
+    } catch (err) { alert("Failed to update."); }
     setIsUpdatingHero(false);
   };
 
   const handleProjectSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    const data = { ...editProject, tags: Array.isArray(editProject.tags) ? editProject.tags : editProject.tags.split(",").map((t:string)=>t.trim()) };
+    const data = { ...editProject, tags: Array.isArray(editProject.tags) ? editProject.tags : editProject.tags.split(",").map((t: string) => t.trim()) };
     if (uploadFile) data.imageUrl = await uploadToImgBB(uploadFile);
-    
+
     if (data.id) {
       await updateDoc(doc(db, "custom_projects", data.id), data);
     } else {
@@ -117,7 +118,7 @@ export default function Dashboard() {
     e.preventDefault();
     const data = { ...editCert };
     if (uploadFile) data.imageUrl = await uploadToImgBB(uploadFile);
-    
+
     if (data.id) {
       await updateDoc(doc(db, "certifications", data.id), data);
     } else {
@@ -150,6 +151,7 @@ export default function Dashboard() {
   const tabs = [
     { id: "inbox", label: "Inbox", icon: <Inbox size={18} />, badge: messages.filter(m => !m.read).length },
     { id: "hero", label: "Hero CMS", icon: <Layout size={18} /> },
+    { id: "gallery", label: "Gallery", icon: <ImageIcon size={18} /> }, // <-- NEW TAB
     { id: "projects", label: "Projects", icon: <LayoutGrid size={18} /> },
     { id: "certs", label: "Certifications", icon: <Award size={18} /> },
     { id: "skills", label: "Skills", icon: <Wrench size={18} /> },
@@ -170,7 +172,7 @@ export default function Dashboard() {
       </nav>
 
       <main className="container mx-auto px-4 md:px-8 py-8 max-w-7xl">
-        
+
         {/* TABS */}
         <div className="flex flex-wrap gap-2 mb-8 p-2 bg-white rounded-2xl border border-slate-200 shadow-sm w-fit">
           {tabs.map((tab) => (
@@ -232,12 +234,19 @@ export default function Dashboard() {
           </motion.div>
         )}
 
+        {/* --- GALLERY TAB --- */}
+        {activeTab === "gallery" && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <GalleryManager />
+          </motion.div>
+        )}
+
         {/* --- PROJECTS TAB --- */}
         {activeTab === "projects" && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="font-syne text-3xl font-bold">Project CMS</h2>
-              <button onClick={() => setEditProject({ title: "", description: "", category: "Web", tags: "", githubUrl: "", liveUrl: "" })} className="px-5 py-2.5 bg-blue-600 text-white font-bold rounded-xl flex items-center gap-2 shadow-md hover:bg-blue-700"><Plus size={18}/> New Project</button>
+              <button onClick={() => setEditProject({ title: "", description: "", category: "Web", tags: "", githubUrl: "", liveUrl: "" })} className="px-5 py-2.5 bg-blue-600 text-white font-bold rounded-xl flex items-center gap-2 shadow-md hover:bg-blue-700"><Plus size={18} /> New Project</button>
             </div>
             <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
               <table className="w-full text-left">
@@ -250,8 +259,8 @@ export default function Dashboard() {
                       <td className="p-6 font-bold text-slate-900">{p.title}</td>
                       <td className="p-6"><span className="px-3 py-1 bg-slate-100 rounded-lg text-xs font-bold text-slate-600">{p.category}</span></td>
                       <td className="p-6 text-right space-x-2">
-                        <button onClick={() => setEditProject(p)} className="p-2 text-slate-500 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"><Edit3 size={18}/></button>
-                        <button onClick={() => deleteDocConfirm("custom_projects", p.id)} className="p-2 text-slate-500 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors"><Trash2 size={18}/></button>
+                        <button onClick={() => setEditProject(p)} className="p-2 text-slate-500 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"><Edit3 size={18} /></button>
+                        <button onClick={() => deleteDocConfirm("custom_projects", p.id)} className="p-2 text-slate-500 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors"><Trash2 size={18} /></button>
                       </td>
                     </tr>
                   ))}
@@ -266,7 +275,7 @@ export default function Dashboard() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="font-syne text-3xl font-bold">Certifications Vault</h2>
-              <button onClick={() => setEditCert({ title: "", issuer: "", date: "", verifyLink: "", gradient: "from-blue-400 to-blue-600" })} className="px-5 py-2.5 bg-blue-600 text-white font-bold rounded-xl flex items-center gap-2 shadow-md hover:bg-blue-700"><Plus size={18}/> New Cert</button>
+              <button onClick={() => setEditCert({ title: "", issuer: "", date: "", verifyLink: "", gradient: "from-blue-400 to-blue-600" })} className="px-5 py-2.5 bg-blue-600 text-white font-bold rounded-xl flex items-center gap-2 shadow-md hover:bg-blue-700"><Plus size={18} /> New Cert</button>
             </div>
             <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
               <table className="w-full text-left">
@@ -280,8 +289,8 @@ export default function Dashboard() {
                       <td className="p-6 text-slate-600">{c.issuer}</td>
                       <td className="p-6 text-center">{c.imageUrl ? <ImageIcon size={18} className="mx-auto text-blue-500" /> : <span className="text-xs text-slate-400">None</span>}</td>
                       <td className="p-6 text-right space-x-2">
-                        <button onClick={() => setEditCert(c)} className="p-2 text-slate-500 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"><Edit3 size={18}/></button>
-                        <button onClick={() => deleteDocConfirm("certifications", c.id)} className="p-2 text-slate-500 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors"><Trash2 size={18}/></button>
+                        <button onClick={() => setEditCert(c)} className="p-2 text-slate-500 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"><Edit3 size={18} /></button>
+                        <button onClick={() => deleteDocConfirm("certifications", c.id)} className="p-2 text-slate-500 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors"><Trash2 size={18} /></button>
                       </td>
                     </tr>
                   ))}
@@ -296,7 +305,7 @@ export default function Dashboard() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="font-syne text-3xl font-bold">Skills Engine</h2>
-              <button onClick={() => setEditSkill({ name: "", category: "Languages", level: 80 })} className="px-5 py-2.5 bg-blue-600 text-white font-bold rounded-xl flex items-center gap-2 shadow-md hover:bg-blue-700"><Plus size={18}/> New Skill</button>
+              <button onClick={() => setEditSkill({ name: "", category: "Languages", level: 80 })} className="px-5 py-2.5 bg-blue-600 text-white font-bold rounded-xl flex items-center gap-2 shadow-md hover:bg-blue-700"><Plus size={18} /> New Skill</button>
             </div>
             <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
               <table className="w-full text-left">
@@ -309,11 +318,11 @@ export default function Dashboard() {
                       <td className="p-6 font-bold text-slate-900">{s.name}</td>
                       <td className="p-6"><span className="px-3 py-1 bg-slate-100 rounded-lg text-xs font-bold text-slate-600">{s.category}</span></td>
                       <td className="p-6">
-                        <div className="flex items-center gap-3"><div className="w-full bg-slate-100 rounded-full h-2 max-w-[100px]"><div className="bg-blue-500 h-2 rounded-full" style={{width:`${s.level}%`}}></div></div><span className="text-xs font-bold text-slate-500">{s.level}%</span></div>
+                        <div className="flex items-center gap-3"><div className="w-full bg-slate-100 rounded-full h-2 max-w-[100px]"><div className="bg-blue-500 h-2 rounded-full" style={{ width: `${s.level}%` }}></div></div><span className="text-xs font-bold text-slate-500">{s.level}%</span></div>
                       </td>
                       <td className="p-6 text-right space-x-2">
-                        <button onClick={() => setEditSkill(s)} className="p-2 text-slate-500 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"><Edit3 size={18}/></button>
-                        <button onClick={() => deleteDocConfirm("skills", s.id)} className="p-2 text-slate-500 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors"><Trash2 size={18}/></button>
+                        <button onClick={() => setEditSkill(s)} className="p-2 text-slate-500 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"><Edit3 size={18} /></button>
+                        <button onClick={() => deleteDocConfirm("skills", s.id)} className="p-2 text-slate-500 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors"><Trash2 size={18} /></button>
                       </td>
                     </tr>
                   ))}
@@ -356,23 +365,23 @@ export default function Dashboard() {
             <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
               <div className="p-6 border-b border-slate-100 flex justify-between items-center">
                 <h2 className="text-2xl font-syne font-bold">{editProject.id ? "Edit Project" : "New Project"}</h2>
-                <button onClick={() => {setEditProject(null); setUploadFile(null);}} className="p-2 hover:bg-slate-100 rounded-full"><X size={20} /></button>
+                <button onClick={() => { setEditProject(null); setUploadFile(null); }} className="p-2 hover:bg-slate-100 rounded-full"><X size={20} /></button>
               </div>
               <div className="p-6 overflow-y-auto space-y-4">
-                <div><label className="block text-xs font-bold text-slate-500 mb-1">Title</label><input required type="text" value={editProject.title} onChange={e=>setEditProject({...editProject, title: e.target.value})} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
-                <div><label className="block text-xs font-bold text-slate-500 mb-1">Description</label><textarea required rows={3} value={editProject.description} onChange={e=>setEditProject({...editProject, description: e.target.value})} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
+                <div><label className="block text-xs font-bold text-slate-500 mb-1">Title</label><input required type="text" value={editProject.title} onChange={e => setEditProject({ ...editProject, title: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
+                <div><label className="block text-xs font-bold text-slate-500 mb-1">Description</label><textarea required rows={3} value={editProject.description} onChange={e => setEditProject({ ...editProject, description: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div><label className="block text-xs font-bold text-slate-500 mb-1">Category</label><input required type="text" value={editProject.category} onChange={e=>setEditProject({...editProject, category: e.target.value})} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
-                  <div><label className="block text-xs font-bold text-slate-500 mb-1">Tags (comma separated)</label><input required type="text" value={Array.isArray(editProject.tags) ? editProject.tags.join(", ") : editProject.tags} onChange={e=>setEditProject({...editProject, tags: e.target.value})} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
+                  <div><label className="block text-xs font-bold text-slate-500 mb-1">Category</label><input required type="text" value={editProject.category} onChange={e => setEditProject({ ...editProject, category: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
+                  <div><label className="block text-xs font-bold text-slate-500 mb-1">Tags (comma separated)</label><input required type="text" value={Array.isArray(editProject.tags) ? editProject.tags.join(", ") : editProject.tags} onChange={e => setEditProject({ ...editProject, tags: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div><label className="block text-xs font-bold text-slate-500 mb-1">GitHub URL</label><input type="text" value={editProject.githubUrl} onChange={e=>setEditProject({...editProject, githubUrl: e.target.value})} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
-                  <div><label className="block text-xs font-bold text-slate-500 mb-1">Live URL</label><input type="text" value={editProject.liveUrl} onChange={e=>setEditProject({...editProject, liveUrl: e.target.value})} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
+                  <div><label className="block text-xs font-bold text-slate-500 mb-1">GitHub URL</label><input type="text" value={editProject.githubUrl} onChange={e => setEditProject({ ...editProject, githubUrl: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
+                  <div><label className="block text-xs font-bold text-slate-500 mb-1">Live URL</label><input type="text" value={editProject.liveUrl} onChange={e => setEditProject({ ...editProject, liveUrl: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
                 </div>
                 <div><label className="block text-xs font-bold text-slate-500 mb-1">Thumbnail Image (ImgBB)</label><input type="file" accept="image/*" onChange={(e) => setUploadFile(e.target.files ? e.target.files[0] : null)} className="w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-700" /></div>
               </div>
               <div className="p-6 border-t border-slate-100 flex justify-end gap-3">
-                <button onClick={() => {setEditProject(null); setUploadFile(null);}} className="px-6 py-2.5 font-bold text-slate-600 hover:bg-slate-100 rounded-xl">Cancel</button>
+                <button onClick={() => { setEditProject(null); setUploadFile(null); }} className="px-6 py-2.5 font-bold text-slate-600 hover:bg-slate-100 rounded-xl">Cancel</button>
                 <button onClick={handleProjectSave} className="px-6 py-2.5 font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md">Save Project</button>
               </div>
             </motion.div>
@@ -385,19 +394,19 @@ export default function Dashboard() {
             <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="bg-white rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden flex flex-col">
               <div className="p-6 border-b border-slate-100 flex justify-between items-center">
                 <h2 className="text-2xl font-syne font-bold">{editCert.id ? "Edit Certification" : "New Certification"}</h2>
-                <button onClick={() => {setEditCert(null); setUploadFile(null);}} className="p-2 hover:bg-slate-100 rounded-full"><X size={20} /></button>
+                <button onClick={() => { setEditCert(null); setUploadFile(null); }} className="p-2 hover:bg-slate-100 rounded-full"><X size={20} /></button>
               </div>
               <div className="p-6 space-y-4">
-                <div><label className="block text-xs font-bold text-slate-500 mb-1">Title</label><input required type="text" value={editCert.title} onChange={e=>setEditCert({...editCert, title: e.target.value})} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
+                <div><label className="block text-xs font-bold text-slate-500 mb-1">Title</label><input required type="text" value={editCert.title} onChange={e => setEditCert({ ...editCert, title: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div><label className="block text-xs font-bold text-slate-500 mb-1">Issuer (e.g. Coursera)</label><input required type="text" value={editCert.issuer} onChange={e=>setEditCert({...editCert, issuer: e.target.value})} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
-                  <div><label className="block text-xs font-bold text-slate-500 mb-1">Date</label><input required type="text" value={editCert.date} onChange={e=>setEditCert({...editCert, date: e.target.value})} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
+                  <div><label className="block text-xs font-bold text-slate-500 mb-1">Issuer (e.g. Coursera)</label><input required type="text" value={editCert.issuer} onChange={e => setEditCert({ ...editCert, issuer: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
+                  <div><label className="block text-xs font-bold text-slate-500 mb-1">Date</label><input required type="text" value={editCert.date} onChange={e => setEditCert({ ...editCert, date: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
                 </div>
-                <div><label className="block text-xs font-bold text-slate-500 mb-1">Verification URL</label><input type="url" value={editCert.verifyLink} onChange={e=>setEditCert({...editCert, verifyLink: e.target.value})} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
+                <div><label className="block text-xs font-bold text-slate-500 mb-1">Verification URL</label><input type="url" value={editCert.verifyLink} onChange={e => setEditCert({ ...editCert, verifyLink: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
                 <div><label className="block text-xs font-bold text-slate-500 mb-1">Upload Certificate Image</label><input type="file" accept="image/*" onChange={(e) => setUploadFile(e.target.files ? e.target.files[0] : null)} className="w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-700" /></div>
               </div>
               <div className="p-6 border-t border-slate-100 flex justify-end gap-3">
-                <button onClick={() => {setEditCert(null); setUploadFile(null);}} className="px-6 py-2.5 font-bold text-slate-600 hover:bg-slate-100 rounded-xl">Cancel</button>
+                <button onClick={() => { setEditCert(null); setUploadFile(null); }} className="px-6 py-2.5 font-bold text-slate-600 hover:bg-slate-100 rounded-xl">Cancel</button>
                 <button onClick={handleCertSave} className="px-6 py-2.5 font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md">Save Cert</button>
               </div>
             </motion.div>
@@ -413,11 +422,11 @@ export default function Dashboard() {
                 <button onClick={() => setEditSkill(null)} className="p-2 hover:bg-slate-100 rounded-full"><X size={20} /></button>
               </div>
               <div className="p-6 space-y-4">
-                <div><label className="block text-xs font-bold text-slate-500 mb-1">Skill Name</label><input required type="text" value={editSkill.name} onChange={e=>setEditSkill({...editSkill, name: e.target.value})} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
-                <div><label className="block text-xs font-bold text-slate-500 mb-1">Category</label><input required type="text" value={editSkill.category} onChange={e=>setEditSkill({...editSkill, category: e.target.value})} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
+                <div><label className="block text-xs font-bold text-slate-500 mb-1">Skill Name</label><input required type="text" value={editSkill.name} onChange={e => setEditSkill({ ...editSkill, name: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
+                <div><label className="block text-xs font-bold text-slate-500 mb-1">Category</label><input required type="text" value={editSkill.category} onChange={e => setEditSkill({ ...editSkill, category: e.target.value })} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl" /></div>
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-1">Proficiency Level ({editSkill.level}%)</label>
-                  <input type="range" min="10" max="100" step="5" value={editSkill.level} onChange={e=>setEditSkill({...editSkill, level: parseInt(e.target.value)})} className="w-full accent-blue-600" />
+                  <input type="range" min="10" max="100" step="5" value={editSkill.level} onChange={e => setEditSkill({ ...editSkill, level: parseInt(e.target.value) })} className="w-full accent-blue-600" />
                 </div>
               </div>
               <div className="p-6 border-t border-slate-100 flex justify-end gap-3">

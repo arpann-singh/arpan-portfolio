@@ -1,108 +1,94 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Lock, Mail, KeyRound, ArrowRight, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-
-const loginSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+import { ShieldCheck, Loader2, ArrowRight } from "lucide-react";
 
 export default function AdminLogin() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const [authError, setAuthError] = useState("");
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-  });
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
-  const onSubmit = async (data: LoginFormValues) => {
-    setIsLoggingIn(true);
-    setAuthError("");
     try {
-      await signInWithEmailAndPassword(auth, data.email, data.password);
+      await signInWithEmailAndPassword(auth, email, password);
+      // Successful login routes you to the Command Center
       router.push("/admin/dashboard");
-    } catch (error: any) {
-      setAuthError("Invalid admin credentials. Access denied.");
-      setIsLoggingIn(false);
+    } catch (err: any) {
+      setError("Invalid credentials or access denied.");
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Background Aesthetics */}
-      <div className="absolute w-[500px] h-[500px] bg-accent/20 rounded-full blur-[120px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 font-sans text-slate-900">
       
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md bg-white p-8 md:p-10 rounded-[2rem] border border-slate-200 shadow-xl relative z-10"
-      >
-        <div className="w-16 h-16 bg-slate-50 text-accent rounded-2xl flex items-center justify-center mb-6 mx-auto border border-slate-100 shadow-sm">
-          <Lock size={32} />
+      <div className="w-full max-w-md bg-white rounded-[2rem] shadow-xl border border-slate-200 p-8 md:p-12 relative overflow-hidden">
+        {/* Background decorative blur */}
+        <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-600/10 rounded-full blur-[60px] pointer-events-none"></div>
+
+        <div className="relative z-10 flex flex-col items-center mb-8">
+          <div className="w-16 h-16 bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-slate-900/20 mb-4">
+            <ShieldCheck size={32} />
+          </div>
+          <h1 className="font-syne text-3xl font-bold tracking-tight">Admin Access</h1>
+          <p className="text-slate-500 text-sm mt-2 text-center">Enter your credentials to access the Command Center.</p>
         </div>
-        
-        <h1 className="font-syne text-3xl font-extrabold text-slate-900 text-center mb-2">Command Center</h1>
-        <p className="text-slate-500 text-center mb-8 font-sans">Restricted access. Authorized personnel only.</p>
 
-        {authError && (
-          <div className="mb-6 p-4 bg-red-50 text-red-600 text-sm font-bold rounded-xl text-center border border-red-100">
-            {authError}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <div>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                <Mail size={20} />
-              </div>
-              <input
-                type="email"
-                {...register("email")}
-                placeholder="Admin Email"
-                className={`w-full pl-12 pr-4 py-4 bg-slate-50 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${errors.email ? "border-red-400 focus:ring-red-200" : "border-slate-200 focus:border-accent focus:ring-accent/20"}`}
-              />
+        <form onSubmit={handleLogin} className="relative z-10 space-y-5">
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl text-center font-medium">
+              {error}
             </div>
-            {errors.email && <p className="text-red-500 text-xs font-bold mt-1 ml-2">{errors.email.message}</p>}
+          )}
+
+          <div>
+            <label className="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Email Address</label>
+            <input 
+              type="email" 
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              placeholder="admin@example.com"
+            />
           </div>
 
           <div>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                <KeyRound size={20} />
-              </div>
-              <input
-                type="password"
-                {...register("password")}
-                placeholder="Password"
-                className={`w-full pl-12 pr-4 py-4 bg-slate-50 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${errors.password ? "border-red-400 focus:ring-red-200" : "border-slate-200 focus:border-accent focus:ring-accent/20"}`}
-              />
-            </div>
-            {errors.password && <p className="text-red-500 text-xs font-bold mt-1 ml-2">{errors.password.message}</p>}
+            <label className="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Password</label>
+            <input 
+              type="password" 
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              placeholder="••••••••"
+            />
           </div>
 
-          <button
-            type="submit"
-            disabled={isLoggingIn}
-            className="w-full py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-accent transition-colors flex items-center justify-center gap-2 mt-4 shadow-md disabled:opacity-70"
+          <button 
+            type="submit" 
+            disabled={isLoading}
+            className="w-full py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors flex justify-center items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-70 mt-4"
           >
-            {isLoggingIn ? <Loader2 className="animate-spin" size={20} /> : "Authenticate"}
-            {!isLoggingIn && <ArrowRight size={20} />}
+            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
+              <>Authenticate <ArrowRight size={18} /></>
+            )}
           </button>
         </form>
-      </motion.div>
+      </div>
+
+      <a href="/" className="mt-8 text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors">
+        &larr; Back to Portfolio
+      </a>
     </div>
   );
 }
