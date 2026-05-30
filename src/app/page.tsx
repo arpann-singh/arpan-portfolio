@@ -83,7 +83,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen relative w-full overflow-hidden bg-slate-100 pb-32">
+    <div className="flex flex-col min-h-screen relative w-full overflow-hidden bg-slate-100 pb-40 md:pb-24">
       
       {/* Responsive Background Orbs */}
       <div className="fixed top-[0%] left-[-10%] sm:left-[5%] w-[80vw] max-w-[500px] aspect-square bg-blue-400/20 rounded-full blur-[80px] sm:blur-[120px] pointer-events-none z-0" />
@@ -91,11 +91,11 @@ export default function Home() {
       <div className="fixed top-[40%] left-[20%] sm:left-[40%] w-[60vw] max-w-[300px] aspect-square bg-cyan-400/20 rounded-full blur-[60px] sm:blur-[90px] pointer-events-none z-0" />
 
       {/* 1. FLAT BENTO BOX HERO SECTION */}
-      <section className="relative z-10 flex flex-col justify-center min-h-screen px-6 sm:px-10 md:px-12 lg:px-16 container mx-auto pt-24 sm:pt-28 pb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-8 auto-rows-auto max-w-7xl mx-auto w-full">
+      <section className="relative z-10 flex flex-col justify-center min-h-screen px-4 sm:px-10 md:px-12 lg:px-16 container mx-auto pt-24 sm:pt-28 pb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 auto-rows-auto max-w-7xl mx-auto w-full">
           
           {/* WELCOME BLOCK */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="col-span-1 md:col-span-2 lg:col-span-3 bg-white/60 backdrop-blur-3xl rounded-[2rem] p-8 sm:p-10 lg:p-14 xl:p-16 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border-2 border-white/80 flex flex-col justify-center relative group">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="col-span-1 md:col-span-2 lg:col-span-3 bg-white/60 backdrop-blur-3xl rounded-[2rem] p-6 sm:p-10 lg:p-14 xl:p-16 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border-2 border-white/80 flex flex-col justify-center relative group">
             <motion.p className="text-blue-600 font-bold tracking-widest uppercase mb-4 sm:mb-6 text-xs sm:text-sm flex items-center gap-2 sm:gap-3 relative z-10">
               <span className="h-[3px] w-8 bg-blue-600 inline-block rounded-full"></span> Welcome to my digital space 🚀
             </motion.p>
@@ -132,12 +132,12 @@ export default function Home() {
           </motion.div>
 
           {/* APERTURE WIDGET */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="col-span-1 md:col-span-1 relative min-h-[220px]">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="col-span-1 md:col-span-1 relative min-h-[250px]">
             <ApertureWidget />
           </motion.div>
 
           {/* LIVE STATUS */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }} className="col-span-1 md:col-span-1 bg-white/60 backdrop-blur-3xl rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border-2 border-white/80 flex flex-col justify-center relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.1)] transition-shadow min-h-[220px]">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }} className="col-span-1 md:col-span-1 bg-white/60 backdrop-blur-3xl rounded-[2rem] p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border-2 border-white/80 flex flex-col justify-center relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.1)] transition-shadow min-h-[220px]">
             <div className="absolute top-0 right-0 w-32 h-32 bg-green-400/20 rounded-full blur-[40px] pointer-events-none group-hover:bg-green-400/30 transition-colors duration-500"></div>
             <div className="flex items-center gap-2 mb-4">
               <span className="text-xl">{statusIcon}</span>
@@ -152,8 +152,8 @@ export default function Home() {
           </motion.div>
 
           {/* DEPLOYMENTS & CV */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.5 }} className="col-span-1 md:col-span-2 lg:col-span-1 flex flex-col sm:flex-row lg:flex-col gap-5 lg:gap-6">
-            <Link href="/projects" className="flex-1 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[2rem] p-6 text-white flex flex-col justify-between group shadow-lg shadow-blue-500/20 border border-blue-400/30 hover:scale-[1.02] transition-transform relative overflow-hidden min-h-[140px] sm:min-h-0">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.5 }} className="col-span-1 md:col-span-2 lg:col-span-1 flex flex-col sm:flex-row lg:flex-col gap-4 lg:gap-6">
+            <Link href="/projects" className="flex-1 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[2rem] p-6 text-white flex flex-col justify-between group shadow-lg shadow-blue-500/20 border border-blue-400/30 hover:scale-[1.02] transition-transform relative overflow-hidden min-h-[140px]">
               <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors z-0"></div>
               <div className="flex justify-between items-start relative z-10 w-full">
                 <h3 className="font-syne text-xl font-bold leading-tight">Deployments &<br/>Case Studies</h3>
@@ -218,7 +218,6 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Code Block Container */}
             <div className="w-full lg:w-1/2 relative min-h-[320px] md:min-h-[400px] rounded-[2rem] flex flex-col overflow-hidden group bg-white shadow-xl border border-slate-200 mt-6 lg:mt-0">
                
                <div className="absolute top-0 right-0 w-40 h-40 md:w-64 md:h-64 bg-cyan-400/10 rounded-full blur-[40px] md:blur-[60px] pointer-events-none group-hover:bg-cyan-400/20 transition-colors duration-700"></div>
