@@ -7,7 +7,6 @@ import Footer from "@/components/Footer";
 import { DevModeProvider } from "@/context/DevModeContext";
 import DevModeWrapper from "@/components/DevModeWrapper";
 import DevModeToggle from "@/components/DevModeToggle";
-import SpotifyWidget from "@/components/SpotifyWidget"; // <-- New Global Import
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const syne = Syne({ subsets: ["latin"], variable: "--font-syne" });
@@ -55,10 +54,9 @@ export default function RootLayout({
             <main className="flex-grow flex flex-col relative">
               {children}
             </main>
-            <Footer />
-            <SpotifyWidget /> {/* <-- Lives globally, outside the main flow */}
+            <Footer /> {/* <-- Lives globally, outside the main flow */}
           </DevModeWrapper>
-          
+
           <DevModeToggle />
         </DevModeProvider>
       </body>

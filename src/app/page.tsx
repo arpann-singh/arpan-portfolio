@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import gsap from "gsap";
-import { ArrowRight, Code2, Database, LayoutTemplate, User, Briefcase, Award, Send, FileText, MapPin, Clock, Terminal } from "lucide-react";
+import { ArrowRight, Code2, Database, LayoutTemplate, User, Briefcase, Award, Send, FileText, MapPin, Terminal, Disc, Clock } from "lucide-react";
 import ApertureWidget from "@/components/ApertureWidget";
 
 const roles = [
@@ -29,6 +29,14 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [time, setTime] = useState<Date | null>(null);
 
+  // --- Live Spotify State ---
+  const [spotifyData, setSpotifyData] = useState({
+    isPlaying: false,
+    song: "Loading...",
+    artist: "Spotify",
+    coverUrl: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=200&auto=format&fit=crop"
+  });
+
   useEffect(() => {
     setMounted(true);
     const interval = setInterval(() => setCurrentRole((prev) => (prev + 1) % roles.length), 3000);
@@ -48,6 +56,40 @@ export default function Home() {
   useEffect(() => {
     setTime(new Date());
     const interval = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // --- Spotify Fetching Logic ---
+  useEffect(() => {
+    const fetchSpotify = async () => {
+      try {
+        const res = await fetch('/api/spotify');
+        if (!res.ok) return;
+        
+        const data = await res.json();
+        
+        if (data.isPlaying) {
+          setSpotifyData({
+            isPlaying: true,
+            song: data.title,
+            artist: data.artist,
+            coverUrl: data.albumImageUrl
+          });
+        } else {
+          setSpotifyData({
+            isPlaying: false,
+            song: "Not Playing",
+            artist: "Spotify",
+            coverUrl: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=200&auto=format&fit=crop"
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch Spotify status", error);
+      }
+    };
+
+    fetchSpotify();
+    const interval = setInterval(fetchSpotify, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -83,19 +125,17 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen relative w-full overflow-hidden bg-slate-100 pb-40 md:pb-24">
+    <div className="flex flex-col min-h-screen relative w-full overflow-hidden bg-slate-100 pb-32">
       
-      {/* Responsive Background Orbs */}
       <div className="fixed top-[0%] left-[-10%] sm:left-[5%] w-[80vw] max-w-[500px] aspect-square bg-blue-400/20 rounded-full blur-[80px] sm:blur-[120px] pointer-events-none z-0" />
       <div className="fixed bottom-[10%] right-[-10%] sm:right-[10%] w-[70vw] max-w-[400px] aspect-square bg-purple-400/20 rounded-full blur-[70px] sm:blur-[100px] pointer-events-none z-0" />
       <div className="fixed top-[40%] left-[20%] sm:left-[40%] w-[60vw] max-w-[300px] aspect-square bg-cyan-400/20 rounded-full blur-[60px] sm:blur-[90px] pointer-events-none z-0" />
 
       {/* 1. FLAT BENTO BOX HERO SECTION */}
-      <section className="relative z-10 flex flex-col justify-center min-h-screen px-4 sm:px-10 md:px-12 lg:px-16 container mx-auto pt-24 sm:pt-28 pb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 auto-rows-auto max-w-7xl mx-auto w-full">
+      <section className="relative z-10 flex flex-col justify-center min-h-screen px-6 sm:px-10 md:px-12 lg:px-16 container mx-auto pt-24 sm:pt-28 pb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-8 auto-rows-auto max-w-7xl mx-auto w-full">
           
-          {/* WELCOME BLOCK */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="col-span-1 md:col-span-2 lg:col-span-3 bg-white/60 backdrop-blur-3xl rounded-[2rem] p-6 sm:p-10 lg:p-14 xl:p-16 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border-2 border-white/80 flex flex-col justify-center relative group">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="col-span-1 md:col-span-2 lg:col-span-3 bg-white/60 backdrop-blur-3xl rounded-[2rem] p-8 sm:p-10 lg:p-14 xl:p-16 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border-2 border-white/80 flex flex-col justify-center relative group">
             <motion.p className="text-blue-600 font-bold tracking-widest uppercase mb-4 sm:mb-6 text-xs sm:text-sm flex items-center gap-2 sm:gap-3 relative z-10">
               <span className="h-[3px] w-8 bg-blue-600 inline-block rounded-full"></span> Welcome to my digital space 🚀
             </motion.p>
@@ -111,7 +151,6 @@ export default function Home() {
             </div>
           </motion.div>
 
-          {/* PHOTO BLOCK */}
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="col-span-1 md:col-span-2 lg:col-span-1 lg:row-span-2 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-4 border-white overflow-hidden relative min-h-[350px] sm:min-h-[450px] lg:min-h-full group">
             <Image 
               src="/hero-photo.jpg" 
@@ -131,29 +170,56 @@ export default function Home() {
             </div>
           </motion.div>
 
-          {/* APERTURE WIDGET */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="col-span-1 md:col-span-1 relative min-h-[250px]">
+          {/* APERTURE WIDGET - RESTORED SHAPE */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="col-span-1 md:col-span-1 relative min-h-[220px]">
             <ApertureWidget />
           </motion.div>
 
-          {/* LIVE STATUS */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }} className="col-span-1 md:col-span-1 bg-white/60 backdrop-blur-3xl rounded-[2rem] p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border-2 border-white/80 flex flex-col justify-center relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.1)] transition-shadow min-h-[220px]">
+          {/* LIGHT MODE STATUS & SPOTIFY BENTO - RESTORED SHAPE & STYLING */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }} className="col-span-1 md:col-span-1 bg-white/60 backdrop-blur-3xl rounded-[2rem] p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border-2 border-white/80 flex flex-col justify-between relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.1)] transition-shadow min-h-[220px]">
             <div className="absolute top-0 right-0 w-32 h-32 bg-green-400/20 rounded-full blur-[40px] pointer-events-none group-hover:bg-green-400/30 transition-colors duration-500"></div>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-xl">{statusIcon}</span>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Live Status</span>
+            
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xl">{statusIcon}</span>
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Live Status</span>
+              </div>
+              <h3 className="font-syne text-3xl font-bold text-slate-900 mb-1 tracking-tight">{timeString}</h3>
+              <p className="text-slate-600 font-sans text-sm font-bold">{statusText}</p>
             </div>
-            <h3 className="font-syne text-3xl font-bold text-slate-900 mb-1 tracking-tight">{timeString}</h3>
-            <p className="text-slate-600 font-sans text-sm font-bold">{statusText}</p>
-            <div className="mt-auto pt-4 flex items-center gap-2">
-              <Clock size={14} className="text-slate-400" />
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Local Time (IST)</span>
+
+            <div className="mt-4 pt-4 border-t border-slate-200/60 flex items-center gap-3">
+              <div className="relative w-10 h-10 rounded-full border border-slate-200 bg-white flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+                <div className={`absolute inset-0 ${spotifyData.isPlaying ? 'animate-[spin_4s_linear_infinite]' : ''}`}>
+                  <Image src={spotifyData.coverUrl} fill alt="Album Art" className="object-cover" />
+                </div>
+                <div className="absolute w-2.5 h-2.5 bg-white rounded-full z-10 border border-slate-200 shadow-sm"></div>
+              </div>
+              
+              <div className="flex flex-col overflow-hidden flex-1">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  {spotifyData.isPlaying ? (
+                    <span className="flex gap-[2px] items-end h-2">
+                      <span className="w-[2px] bg-[#1DB954] animate-[bounce_1s_infinite] h-full"></span>
+                      <span className="w-[2px] bg-[#1DB954] animate-[bounce_0.8s_infinite] h-1/2"></span>
+                      <span className="w-[2px] bg-[#1DB954] animate-[bounce_1.2s_infinite] h-3/4"></span>
+                    </span>
+                  ) : (
+                    <Disc size={10} className="text-slate-400" />
+                  )}
+                  <span className={`text-[9px] font-bold uppercase tracking-wider ${spotifyData.isPlaying ? 'text-[#1DB954]' : 'text-slate-400'}`}>
+                    {spotifyData.isPlaying ? 'Now Playing' : 'Spotify Offline'}
+                  </span>
+                </div>
+                <p className="text-slate-900 font-bold text-sm truncate leading-tight">{spotifyData.song}</p>
+                <p className="text-slate-500 text-xs truncate">{spotifyData.artist}</p>
+              </div>
             </div>
           </motion.div>
 
-          {/* DEPLOYMENTS & CV */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.5 }} className="col-span-1 md:col-span-2 lg:col-span-1 flex flex-col sm:flex-row lg:flex-col gap-4 lg:gap-6">
-            <Link href="/projects" className="flex-1 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[2rem] p-6 text-white flex flex-col justify-between group shadow-lg shadow-blue-500/20 border border-blue-400/30 hover:scale-[1.02] transition-transform relative overflow-hidden min-h-[140px]">
+          {/* DEPLOYMENTS & CV - RESTORED SHAPE */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.5 }} className="col-span-1 md:col-span-2 lg:col-span-1 flex flex-col sm:flex-row lg:flex-col gap-5 lg:gap-6">
+            <Link href="/projects" className="flex-1 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[2rem] p-6 text-white flex flex-col justify-between group shadow-lg shadow-blue-500/20 border border-blue-400/30 hover:scale-[1.02] transition-transform relative overflow-hidden min-h-[140px] sm:min-h-0">
               <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors z-0"></div>
               <div className="flex justify-between items-start relative z-10 w-full">
                 <h3 className="font-syne text-xl font-bold leading-tight">Deployments &<br/>Case Studies</h3>
@@ -170,7 +236,6 @@ export default function Home() {
 
       <SectionDivider />
 
-      {/* 2. SKILLS BENTO SECTION */}
       <section className="relative z-20 py-8">
         <div className="container mx-auto px-6 sm:px-10 md:px-12 lg:px-16 max-w-7xl">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 lg:gap-8">
@@ -196,7 +261,6 @@ export default function Home() {
 
       <SectionDivider />
 
-      {/* 3. ENHANCED ABOUT ME BENTO SECTION */}
       <section className="relative z-20 py-8">
         <div className="container mx-auto px-6 sm:px-10 md:px-12 lg:px-16 max-w-7xl">
           <motion.div {...sectionReveal} className="bg-white/60 backdrop-blur-xl rounded-[2.5rem] p-8 md:p-12 lg:p-16 border-2 border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col lg:flex-row gap-8 lg:gap-14 items-center relative overflow-hidden">
@@ -256,7 +320,6 @@ export default function Home() {
 
       <SectionDivider />
 
-      {/* 4. LIGHT MODE "MACOS" PROJECTS SECTION */}
       <section className="relative z-20 py-8">
         <div className="container mx-auto px-6 sm:px-10 md:px-12 lg:px-16 max-w-7xl">
           <motion.div {...sectionReveal} className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
@@ -272,7 +335,6 @@ export default function Home() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-8">
-            
             <motion.div {...sectionReveal} className="group bg-white/80 backdrop-blur-xl rounded-[2rem] border-2 border-white/80 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all flex flex-col">
               <div className="h-10 bg-slate-100/80 backdrop-blur-md flex items-center px-6 gap-2 border-b border-slate-200 relative">
                 <div className="flex gap-2 absolute left-6">
@@ -320,14 +382,12 @@ export default function Home() {
                 </div>
               </div>
             </motion.div>
-
           </div>
         </div>
       </section>
 
       <SectionDivider />
 
-      {/* 5. CERTS BENTO SECTION */}
       <section className="relative z-20 py-8">
         <div className="container mx-auto px-6 sm:px-10 md:px-12 lg:px-16 max-w-7xl">
           <motion.div {...sectionReveal} className="bg-white/60 backdrop-blur-xl rounded-[2.5rem] p-10 lg:p-14 text-center border-2 border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col justify-center">
@@ -347,7 +407,6 @@ export default function Home() {
 
       <SectionDivider />
 
-      {/* 6. CALL TO ACTION BENTO SECTION */}
       <section className="relative z-20 py-8 mb-12">
         <div className="container mx-auto px-6 sm:px-10 md:px-12 lg:px-16 max-w-7xl">
           <motion.div {...sectionReveal} className="bg-slate-900 text-white rounded-[3rem] p-10 md:p-16 lg:p-20 text-center shadow-2xl relative overflow-hidden">
