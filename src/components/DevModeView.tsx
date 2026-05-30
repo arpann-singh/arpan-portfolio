@@ -1,14 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Terminal, Download, Code, Briefcase, Mail } from "lucide-react";
+import { Terminal, Download, Code, Briefcase } from "lucide-react";
 import { useState } from "react";
 
 export default function DevModeView() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="fixed bottom-24 right-4 md:bottom-8 md:right-8 z-[100] flex flex-col items-end gap-3">
+    <div className="fixed bottom-[120px] right-4 md:bottom-8 md:right-8 z-[100] flex flex-col items-end gap-3">
       {isOpen && (
         <motion.div 
           initial={{ opacity: 0, y: 20, scale: 0.9 }}

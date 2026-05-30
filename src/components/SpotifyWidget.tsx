@@ -18,7 +18,7 @@ interface SpotifyData {
 export default function SpotifyWidget() {
   const [data, setData] = useState<SpotifyData>({ isPlaying: false });
   const [loading, setLoading] = useState(true);
-  const [rgb, setRgb] = useState<string>("29, 185, 84"); 
+  const [rgb, setRgb] = useState<string>("29, 185, 84");
 
   useEffect(() => {
     const fetchSpotifyData = async () => {
@@ -54,15 +54,12 @@ export default function SpotifyWidget() {
   if (loading) return null;
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      // Increased bottom spacing and md:left spacing to keep it away from borders
-      className="fixed bottom-6 sm:bottom-8 md:bottom-10 left-1/2 -translate-x-1/2 md:left-10 md:translate-x-0 z-50 group"
+    <motion.div
+      className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] max-w-[400px] md:left-auto md:right-1/2 md:translate-x-[45%] lg:translate-x-[60%] z-[90] bg-slate-900/90 backdrop-blur-md rounded-full shadow-2xl border border-slate-700/50 flex items-center justify-between overflow-hidden p-2"
     >
       {/* 1. THE AMBILIGHT AURA */}
       {data.isPlaying && (
-        <div 
+        <div
           className="absolute inset-0 rounded-full blur-[20px] sm:blur-[25px] transition-colors duration-1000 -z-10"
           style={{ backgroundColor: `rgba(${rgb}, 0.5)`, transform: "scale(1.15)" }}
         />
@@ -83,28 +80,28 @@ export default function SpotifyWidget() {
       )}
 
       {/* 3. THE FLOATING PILL */}
-      <motion.a 
-        href={data.isPlaying ? data.songUrl : undefined} 
+      <motion.a
+        href={data.isPlaying ? data.songUrl : undefined}
         target={data.isPlaying ? "_blank" : undefined}
         rel="noreferrer"
         animate={
           data.isPlaying
             ? {
-                boxShadow: [
-                  `0px 0px 0px 0px rgba(${rgb}, 0)`,
-                  `0px 0px 15px 3px rgba(${rgb}, 0.5)`,
-                  `0px 0px 0px 0px rgba(${rgb}, 0)`,
-                ],
-                borderColor: [
-                  "rgba(255, 255, 255, 0.1)",
-                  `rgba(${rgb}, 0.8)`,
-                  "rgba(255, 255, 255, 0.1)",
-                ],
-              }
+              boxShadow: [
+                `0px 0px 0px 0px rgba(${rgb}, 0)`,
+                `0px 0px 15px 3px rgba(${rgb}, 0.5)`,
+                `0px 0px 0px 0px rgba(${rgb}, 0)`,
+              ],
+              borderColor: [
+                "rgba(255, 255, 255, 0.1)",
+                `rgba(${rgb}, 0.8)`,
+                "rgba(255, 255, 255, 0.1)",
+              ],
+            }
             : {
-                boxShadow: "0px 0px 0px 0px rgba(0,0,0,0)",
-                borderColor: "rgba(255, 255, 255, 0.1)",
-              }
+              boxShadow: "0px 0px 0px 0px rgba(0,0,0,0)",
+              borderColor: "rgba(255, 255, 255, 0.1)",
+            }
         }
         transition={{
           repeat: Infinity,
@@ -112,9 +109,8 @@ export default function SpotifyWidget() {
           ease: "easeInOut",
         }}
         // The w-[calc(100vw-3rem)] ensures it never touches the edge on mobile
-        className={`relative flex items-center h-14 sm:h-16 rounded-full shadow-2xl border backdrop-blur-2xl overflow-hidden transition-[width,background-color] duration-300 z-10 ${
-          data.isPlaying ? "w-[calc(100vw-3rem)] max-w-[320px] bg-slate-900/90 cursor-pointer" : "w-14 sm:w-16 bg-slate-900/60 hover:w-[160px] cursor-default"
-        }`}
+        className={`relative flex items-center h-14 sm:h-16 rounded-full shadow-2xl border backdrop-blur-2xl overflow-hidden transition-[width,background-color] duration-300 z-10 ${data.isPlaying ? "w-[calc(100vw-3rem)] max-w-[320px] bg-slate-900/90 cursor-pointer" : "w-14 sm:w-16 bg-slate-900/60 hover:w-[160px] cursor-default"
+          }`}
       >
         {/* Background Ambient Blur Inside the Pill */}
         {data.isPlaying && data.albumImageUrl && (
