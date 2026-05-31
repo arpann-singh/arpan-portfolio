@@ -7,13 +7,14 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, setDoc, getDoc, addDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, Inbox, LayoutGrid, ShieldCheck, Loader2, Trash2, CheckCircle, FileText, PieChart, Wrench, Image as ImageIcon, Plus, Layout, Edit3, X, UploadCloud, Award } from "lucide-react";
+import { LogOut, Inbox, LayoutGrid, ShieldCheck, Loader2, Trash2, CheckCircle, FileText, PieChart, Wrench, Image as ImageIcon, Plus, Layout, Edit3, X, UploadCloud, Award, Star, AlertCircle } from "lucide-react";
 import GalleryManager from "@/components/admin/GalleryManager";
 
 export default function Dashboard() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("inbox");
+  const [status, setStatus] = useState<{msg: string, type: 'success' | 'error'} | null>(null);
 
   // --- DATA STATES ---
   const [messages, setMessages] = useState<any[]>([]);
@@ -73,8 +74,16 @@ export default function Dashboard() {
   };
 
   // --- UNIVERSAL HELPERS ---
+  const notify = (msg: string, type: 'success' | 'error') => {
+    setStatus({ msg, type });
+    setTimeout(() => setStatus(null), 3000);
+  };
+
   const deleteDocConfirm = async (collectionName: string, id: string) => {
-    if (confirm("Are you sure you want to delete this?")) await deleteDoc(doc(db, collectionName, id));
+    if (confirm("Are you sure you want to delete this?")) {
+      await deleteDoc(doc(db, collectionName, id));
+      notify("Deleted successfully", "success");
+    }
   };
 
   const uploadToImgBB = async (file: File) => {
@@ -82,6 +91,20 @@ export default function Dashboard() {
     const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`, { method: "POST", body: formData });
     const data = await res.json();
     return data.data.url;
+  };
+
+  // --- THE STAR LOGIC (MAX 2) ---
+  const toggleFeature = async (collectionName: string, item: any, list: any[]) => {
+    const currentlyFeatured = list.filter(i => i.featured).length;
+    
+    // If trying to star it, and there are already 2 starred items, block it.
+    if (!item.featured && currentlyFeatured >= 2) {
+      notify(`Maximum 2 items can be featured. Unstar an item first.`, "error");
+      return;
+    }
+
+    await updateDoc(doc(db, collectionName, item.id), { featured: !item.featured });
+    notify(item.featured ? "Removed from Homepage" : "Featured on Homepage", "success");
   };
 
   // --- SPECIFIC SAVES ---
@@ -96,8 +119,8 @@ export default function Dashboard() {
       await setDoc(doc(db, "settings", "hero"), updatedHeroData);
       setHeroData(updatedHeroData);
       setHeroFiles({ card1: null, card2: null, card3: null });
-      alert("Hero section updated!");
-    } catch (err) { alert("Failed to update."); }
+      notify("Hero section updated!", "success");
+    } catch (err) { notify("Failed to update.", "error"); }
     setIsUpdatingHero(false);
   };
 
@@ -108,8 +131,10 @@ export default function Dashboard() {
 
     if (data.id) {
       await updateDoc(doc(db, "custom_projects", data.id), data);
+      notify("Project updated", "success");
     } else {
-      await addDoc(collection(db, "custom_projects"), { ...data, createdAt: serverTimestamp() });
+      await addDoc(collection(db, "custom_projects"), { ...data, featured: false, createdAt: serverTimestamp() });
+      notify("Project added", "success");
     }
     setEditProject(null); setUploadFile(null);
   };
@@ -121,16 +146,23 @@ export default function Dashboard() {
 
     if (data.id) {
       await updateDoc(doc(db, "certifications", data.id), data);
+      notify("Certification updated", "success");
     } else {
-      await addDoc(collection(db, "certifications"), data);
+      await addDoc(collection(db, "certifications"), { ...data, featured: false, createdAt: serverTimestamp() });
+      notify("Certification added", "success");
     }
     setEditCert(null); setUploadFile(null);
   };
 
   const handleSkillSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editSkill.id) await updateDoc(doc(db, "skills", editSkill.id), editSkill);
-    else await addDoc(collection(db, "skills"), editSkill);
+    if (editSkill.id) {
+      await updateDoc(doc(db, "skills", editSkill.id), editSkill);
+      notify("Skill updated", "success");
+    } else {
+      await addDoc(collection(db, "skills"), editSkill);
+      notify("Skill added", "success");
+    }
     setEditSkill(null);
   };
 
@@ -145,13 +177,14 @@ export default function Dashboard() {
       await setDoc(doc(db, "settings", "resume"), { url: downloadURL, updatedAt: new Date() });
       setCurrentResumeUrl(downloadURL);
       setResumeFile(null); setIsUploadingResume(false);
+      notify("Resume updated successfully", "success");
     });
   };
 
   const tabs = [
     { id: "inbox", label: "Inbox", icon: <Inbox size={18} />, badge: messages.filter(m => !m.read).length },
     { id: "hero", label: "Hero CMS", icon: <Layout size={18} /> },
-    { id: "gallery", label: "Gallery", icon: <ImageIcon size={18} /> }, // <-- NEW TAB
+    { id: "gallery", label: "Gallery", icon: <ImageIcon size={18} /> },
     { id: "projects", label: "Projects", icon: <LayoutGrid size={18} /> },
     { id: "certs", label: "Certifications", icon: <Award size={18} /> },
     { id: "skills", label: "Skills", icon: <Wrench size={18} /> },
@@ -162,6 +195,14 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 font-sans pb-20">
+      
+      {/* Toast Notification */}
+      {status && (
+        <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className={`fixed top-20 right-6 z-50 p-4 rounded-xl flex items-center gap-3 font-bold shadow-xl ${status.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+          {status.type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />} {status.msg}
+        </motion.div>
+      )}
+
       {/* NAVBAR */}
       <nav className="bg-white/80 backdrop-blur-xl border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-40 shadow-sm">
         <div className="flex items-center gap-3">
@@ -255,12 +296,18 @@ export default function Dashboard() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {projects.map(p => (
-                    <tr key={p.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="p-6 font-bold text-slate-900">{p.title}</td>
+                    <tr key={p.id} className={`transition-colors ${p.featured ? 'bg-amber-50/40' : 'hover:bg-slate-50'}`}>
+                      <td className="p-6 font-bold text-slate-900 flex items-center gap-2">
+                        {p.featured && <Star size={16} className="fill-amber-500 text-amber-500" />}
+                        {p.title}
+                      </td>
                       <td className="p-6"><span className="px-3 py-1 bg-slate-100 rounded-lg text-xs font-bold text-slate-600">{p.category}</span></td>
                       <td className="p-6 text-right space-x-2">
-                        <button onClick={() => setEditProject(p)} className="p-2 text-slate-500 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"><Edit3 size={18} /></button>
-                        <button onClick={() => deleteDocConfirm("custom_projects", p.id)} className="p-2 text-slate-500 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors"><Trash2 size={18} /></button>
+                        <button onClick={() => toggleFeature("custom_projects", p, projects)} className={`p-2 rounded-lg transition-colors inline-flex ${p.featured ? 'bg-amber-100 text-amber-600 hover:bg-amber-200' : 'text-slate-400 hover:bg-amber-50 hover:text-amber-500'}`} title="Toggle Homepage Feature">
+                          <Star size={18} className={p.featured ? "fill-amber-500" : ""} />
+                        </button>
+                        <button onClick={() => setEditProject(p)} className="p-2 text-slate-500 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors inline-flex"><Edit3 size={18} /></button>
+                        <button onClick={() => deleteDocConfirm("custom_projects", p.id)} className="p-2 text-slate-500 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors inline-flex"><Trash2 size={18} /></button>
                       </td>
                     </tr>
                   ))}
@@ -284,13 +331,19 @@ export default function Dashboard() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {certs.map(c => (
-                    <tr key={c.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="p-6 font-bold text-slate-900">{c.title}</td>
+                    <tr key={c.id} className={`transition-colors ${c.featured ? 'bg-amber-50/40' : 'hover:bg-slate-50'}`}>
+                      <td className="p-6 font-bold text-slate-900 flex items-center gap-2">
+                        {c.featured && <Star size={16} className="fill-amber-500 text-amber-500" />}
+                        {c.title}
+                      </td>
                       <td className="p-6 text-slate-600">{c.issuer}</td>
                       <td className="p-6 text-center">{c.imageUrl ? <ImageIcon size={18} className="mx-auto text-blue-500" /> : <span className="text-xs text-slate-400">None</span>}</td>
                       <td className="p-6 text-right space-x-2">
-                        <button onClick={() => setEditCert(c)} className="p-2 text-slate-500 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"><Edit3 size={18} /></button>
-                        <button onClick={() => deleteDocConfirm("certifications", c.id)} className="p-2 text-slate-500 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors"><Trash2 size={18} /></button>
+                        <button onClick={() => toggleFeature("certifications", c, certs)} className={`p-2 rounded-lg transition-colors inline-flex ${c.featured ? 'bg-amber-100 text-amber-600 hover:bg-amber-200' : 'text-slate-400 hover:bg-amber-50 hover:text-amber-500'}`} title="Toggle Homepage Feature">
+                          <Star size={18} className={c.featured ? "fill-amber-500" : ""} />
+                        </button>
+                        <button onClick={() => setEditCert(c)} className="p-2 text-slate-500 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors inline-flex"><Edit3 size={18} /></button>
+                        <button onClick={() => deleteDocConfirm("certifications", c.id)} className="p-2 text-slate-500 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors inline-flex"><Trash2 size={18} /></button>
                       </td>
                     </tr>
                   ))}
