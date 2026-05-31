@@ -3,21 +3,21 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
 import { ArrowRight, Code2, Database, LayoutTemplate, User, Briefcase, Award, Send, FileText, MapPin, Terminal, Disc, Star } from "lucide-react";
 import ApertureWidget from "@/components/ApertureWidget";
 import { db } from "@/lib/firebase";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 
+// Separated text and emoji so bg-clip-text doesn't ruin the emoji's native colors
 const roles = [
-  "IT Student 🎓",
-  "Python Developer 🐍",
-  "UI/UX Designer 🎨",
-  "GDSC Member 💡",
+  { text: "IT Student", emoji: "🎓" },
+  { text: "Py Developer", emoji: "🐍" },
+  { text: "UI/UX Designer", emoji: "🎨" },
+  { text: "GDSC Member", emoji: "💡" },
 ];
 
-// --- UPDATED VISIBLE SECTION DIVIDER ---
 const SectionDivider = () => (
   <div className="w-full max-w-5xl mx-auto py-10 sm:py-14 flex items-center justify-center pointer-events-none px-6">
     <div className="w-1/3 h-[2px] bg-gradient-to-r from-transparent to-slate-300/80 rounded-full"></div>
@@ -32,7 +32,6 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [time, setTime] = useState<Date | null>(null);
 
-  // --- Live Spotify State ---
   const [spotifyData, setSpotifyData] = useState({
     isPlaying: false,
     song: "Loading...",
@@ -40,11 +39,9 @@ export default function Home() {
     coverUrl: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=200&auto=format&fit=crop"
   });
 
-  // --- Dynamic Featured Data States ---
   const [featuredProjects, setFeaturedProjects] = useState<any[]>([]);
   const [featuredCerts, setFeaturedCerts] = useState<any[]>([]);
 
-  // Fetch Featured Data from Firebase
   useEffect(() => {
     const unsubProjects = onSnapshot(query(collection(db, "custom_projects"), where("featured", "==", true)), (snap) => {
       setFeaturedProjects(snap.docs.map(d => ({ id: d.id, ...d.data() })).slice(0, 2));
@@ -77,15 +74,12 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // --- Spotify Fetching Logic ---
   useEffect(() => {
     const fetchSpotify = async () => {
       try {
         const res = await fetch('/api/spotify');
         if (!res.ok) return;
-
         const data = await res.json();
-
         if (data.isPlaying) {
           setSpotifyData({
             isPlaying: true,
@@ -105,7 +99,6 @@ export default function Home() {
         console.error("Failed to fetch Spotify status", error);
       }
     };
-
     fetchSpotify();
     const interval = setInterval(fetchSpotify, 10000);
     return () => clearInterval(interval);
@@ -157,25 +150,37 @@ export default function Home() {
             <motion.p className="text-blue-600 font-bold tracking-widest uppercase mb-4 sm:mb-6 text-xs sm:text-sm flex items-center gap-2 sm:gap-3 relative z-10">
               <span className="h-[3px] w-8 bg-blue-600 inline-block rounded-full"></span> Welcome to my digital space 🚀
             </motion.p>
-            <h1
-              ref={heroTextRef}
-              className="font-syne text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl font-extrabold tracking-tighter leading-[1.05] sm:leading-[1.1] mb-6 relative z-10 text-slate-900 break-words"
-            >
-              <span className="inline-block">I'm an</span>{" "}
-              <span className="inline-block min-w-[280px] text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600">
-                <motion.span
-                  key={currentRole}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  {roles[currentRole]}
-                </motion.span>
-              </span>
+
+            {/* BULLETPROOF TEXT CONTAINER */}
+            <h1 ref={heroTextRef} className="font-syne text-4xl sm:text-5xl md:text-5xl lg:text-6xl font-extrabold tracking-tighter leading-tight sm:leading-[1.2] mb-4 sm:mb-6 relative z-10 text-slate-900">
+              <span className="block mb-2 sm:mb-3">I'm an</span>
+
+              {/* mode="wait" ensures elements don't overlap, so no absolute positioning is needed! */}
+              <div className="h-[1.5em] flex items-center">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentRole}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -15 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex items-center gap-2 sm:gap-4 whitespace-nowrap"
+                  >
+                    {/* Gradient applied ONLY to the text */}
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 py-1">
+                      {roles[currentRole].text}
+                    </span>
+                    {/* Native rendering for the emoji */}
+                    <span className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl inline-block drop-shadow-sm">
+                      {roles[currentRole].emoji}
+                    </span>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
             </h1>
+
             <div className="mb-2 sm:mb-4 relative z-10">
-              <p className="text-lg sm:text-xl md:text-2xl text-slate-600 font-medium max-w-2xl">
+              <p className="text-lg sm:text-xl md:text-2xl text-slate-600 font-medium max-w-2xl mt-4 sm:mt-0">
                 Merging{" "}
                 <span className="text-blue-600 font-semibold">complex logic</span>{" "}
                 with{" "}
@@ -276,7 +281,7 @@ export default function Home() {
             {[
               { title: "Backend Magic 🔮", icon: <Database className="text-cyan-500 w-10 h-10 mb-4" />, desc: "Python, Firebase, Node.js" },
               { title: "Pixel Perfect UI ✨", icon: <LayoutTemplate className="text-indigo-500 w-10 h-10 mb-4" />, desc: "Next.js, TypeScript, Figma" },
-              { title: "AI Innovation 🤖", icon: <Code2 className="text-blue-500 w-10 h-10 mb-4" />, desc: "Generative AI, Prompt Engineering" },
+              { title: "AI Innovation ��", icon: <Code2 className="text-blue-500 w-10 h-10 mb-4" />, desc: "Generative AI, Prompt Engineering" },
             ].map((skill, i) => (
               <motion.div key={i} {...sectionReveal} transition={{ delay: i * 0.1, duration: 0.5 }} className="p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl border-2 border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all group">
                 {skill.icon}
