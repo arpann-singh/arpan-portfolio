@@ -7,6 +7,8 @@ import Footer from "@/components/Footer";
 import { DevModeProvider } from "@/context/DevModeContext";
 import DevModeWrapper from "@/components/DevModeWrapper";
 import DevModeToggle from "@/components/DevModeToggle";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const syne = Syne({ subsets: ["latin"], variable: "--font-syne" });
@@ -45,20 +47,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body className={`${inter.variable} ${syne.variable} font-sans bg-slate-100 text-slate-900 antialiased flex flex-col min-h-screen`}>
-        <DevModeProvider>
-          <DevModeWrapper>
-            <CustomCursor />
-            <Navbar />
-            <main className="flex-grow flex flex-col relative">
-              {children}
-            </main>
-            <Footer /> {/* <-- Lives globally, outside the main flow */}
-          </DevModeWrapper>
-
-          <DevModeToggle />
-        </DevModeProvider>
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <body className={`${inter.variable} ${syne.variable} font-sans bg-slate-100 dark:bg-[#020617] text-slate-900 dark:text-white antialiased flex flex-col min-h-screen transition-colors duration-500`}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <DevModeProvider>
+            <DevModeWrapper>
+              <CustomCursor />
+              <Navbar />
+              <main className="flex-grow flex flex-col relative">
+                {children}
+              </main>
+              <Footer />
+            </DevModeWrapper>
+            <DevModeToggle />
+            <ThemeToggle /> {/* <-- The new toggle button */}
+          </DevModeProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

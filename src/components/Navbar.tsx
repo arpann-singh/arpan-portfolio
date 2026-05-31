@@ -1,134 +1,118 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 import { Menu, X } from "lucide-react";
-
-const navLinks = [
-  { name: "Home 🏠", path: "/" },
-  { name: "About 👨‍💻", path: "/about" },
-  { name: "Projects 🚀", path: "/projects" },
-  { name: "Certificates 📜", path: "/certifications" },
-  { name: "Skills ⚡", path: "/skills" },
-  { name: "Contact 📬", path: "/contact" },
-];
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Close mobile menu automatically when a route changes
-  useEffect(() => {
-    setIsOpen(false);
-  }, [pathname]);
+  const leftLinks = [
+    { name: "Home", path: "/" },
+    { name: "About", path: "/about" },
+    { name: "Projects", path: "/projects" },
+  ];
 
-  // Lock body scroll when mobile menu is open to prevent background scrolling
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => { document.body.style.overflow = "unset"; }
-  }, [isOpen]);
+  const rightLinks = [
+    { name: "Certs", path: "/certifications" },
+    { name: "Skills", path: "/skills" },
+  ];
+
+  const allLinks = [...leftLinks, ...rightLinks];
+  const isActive = (path: string) => pathname === path || (path !== "/" && pathname.startsWith(path));
 
   return (
     <>
-      {/* FROSTED GLASS HEADER */}
-      <header className="fixed top-0 left-0 w-full z-50 bg-white/70 backdrop-blur-2xl border-b border-white/50 shadow-[0_4px_30px_rgb(0,0,0,0.03)]">
-        <div className="container mx-auto px-4 sm:px-6 md:px-12 max-w-7xl h-20 flex items-center justify-between">
-          
-          {/* LOGO */}
-          <Link href="/" className="font-syne text-2xl font-extrabold text-slate-900 tracking-tighter z-50 relative">
-            ARPAN<span className="text-blue-600">.</span>
-          </Link>
+      <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-5xl bg-white/60 backdrop-blur-2xl border-2 border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.06)] rounded-full px-4 sm:px-6 py-2.5 flex items-center justify-between transition-all duration-300">
+        
+        {/* DESKTOP: Left Side Links */}
+        <div className="hidden md:flex items-center justify-end flex-1 gap-1 pr-6 lg:pr-10">
+          {leftLinks.map((link) => (
+            <Link key={link.name} href={link.path} className="relative px-4 py-2 rounded-full group">
+              <span className={`relative z-10 font-sans font-bold text-xs uppercase tracking-widest transition-colors duration-300 ${isActive(link.path) ? "text-slate-900" : "text-slate-500 group-hover:text-slate-900"}`}>
+                {link.name}
+              </span>
+              {isActive(link.path) && (
+                <motion.div layoutId="nav-pill" className="absolute inset-0 bg-white rounded-full shadow-sm border border-slate-100 z-0" transition={{ type: "spring", stiffness: 400, damping: 30 }} />
+              )}
+            </Link>
+          ))}
+        </div>
 
-          {/* DESKTOP NAVIGATION (Hidden on Mobile & Tablet) */}
-          <nav className="hidden lg:flex items-center gap-1 bg-white/50 border border-slate-200/50 p-1.5 rounded-full shadow-sm">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.path;
-              return (
+        {/* CENTER: ARPAN. Branding */}
+        <Link href="/" className="flex-shrink-0 flex items-center justify-center relative group px-4">
+          <span className="font-syne text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 uppercase">
+            ARPAN
+            <span className="text-blue-600">.</span>
+          </span>
+        </Link>
+
+        {/* DESKTOP: Right Side Links & Contact Button */}
+        <div className="hidden md:flex items-center justify-start flex-1 gap-1 pl-6 lg:pl-10">
+          {rightLinks.map((link) => (
+            <Link key={link.name} href={link.path} className="relative px-4 py-2 rounded-full group">
+              <span className={`relative z-10 font-sans font-bold text-xs uppercase tracking-widest transition-colors duration-300 ${isActive(link.path) ? "text-slate-900" : "text-slate-500 group-hover:text-slate-900"}`}>
+                {link.name}
+              </span>
+              {isActive(link.path) && (
+                <motion.div layoutId="nav-pill" className="absolute inset-0 bg-white rounded-full shadow-sm border border-slate-100 z-0" transition={{ type: "spring", stiffness: 400, damping: 30 }} />
+              )}
+            </Link>
+          ))}
+          <Link href="/contact" className="ml-2 px-5 py-2.5 bg-slate-900 text-white rounded-full font-bold text-xs uppercase tracking-widest shadow-md hover:bg-blue-600 hover:shadow-lg transition-all hover:-translate-y-0.5">
+            Contact
+          </Link>
+        </div>
+
+        {/* MOBILE: Hamburger Toggle */}
+        <div className="flex md:hidden w-full justify-between items-center">
+          <div className="w-8"></div>
+          <Link href="/" className="font-syne font-black text-2xl tracking-tighter text-slate-900">
+             ARPAN<span className="text-blue-600">.</span>
+          </Link>
+          <button 
+            onClick={() => setIsMobileMenuOpen(true)} 
+            className="p-2.5 text-slate-700 bg-white rounded-full border border-slate-200 shadow-sm active:scale-95 transition-transform"
+          >
+            <Menu size={20} />
+          </button>
+        </div>
+      </nav>
+
+      {/* MOBILE MENU */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed inset-0 z-[100] bg-white/95 backdrop-blur-2xl flex flex-col pointer-events-auto p-6"
+          >
+            <div className="flex justify-between items-center mb-16 pt-2">
+              <span className="font-syne font-black text-2xl tracking-tighter text-slate-900">ARPAN.</span>
+              <button 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-2.5 bg-slate-100 rounded-full border border-slate-200 text-slate-900 active:scale-95 transition-transform"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="flex flex-col gap-6 text-center">
+              {allLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.path}
-                  className={`relative px-5 py-2 rounded-full text-sm font-bold transition-colors z-10 ${
-                    isActive ? "text-blue-700" : "text-slate-600 hover:text-slate-900"
-                  }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`font-syne font-extrabold text-4xl tracking-tight transition-colors ${isActive(link.path) ? "text-blue-600" : "text-slate-800 hover:text-blue-500"}`}
                 >
-                  {/* Sliding Pill Animation for Active Link */}
-                  {isActive && (
-                    <motion.div
-                      layoutId="desktop-nav-pill"
-                      className="absolute inset-0 bg-blue-100/80 rounded-full -z-10"
-                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                    />
-                  )}
                   {link.name}
                 </Link>
-              );
-            })}
-          </nav>
-
-          {/* MOBILE/TABLET MENU TOGGLE */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden p-2 text-slate-700 hover:bg-slate-100 rounded-full transition-colors z-50 relative"
-            aria-label="Toggle Menu"
-          >
-            <motion.div animate={{ rotate: isOpen ? 90 : 0 }} transition={{ duration: 0.2 }}>
-              {isOpen ? <X size={26} /> : <Menu size={26} />}
-            </motion.div>
-          </button>
-        </div>
-      </header>
-
-      {/* MOBILE / TABLET FULLSCREEN MENU */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed inset-0 z-40 bg-slate-50/95 backdrop-blur-3xl flex flex-col items-center justify-center lg:hidden"
-          >
-            <div className="flex flex-col items-center gap-4 w-full px-6">
-              {navLinks.map((link, i) => {
-                const isActive = pathname === link.path;
-                return (
-                  <motion.div
-                    key={link.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }} // Staggered entrance
-                    className="w-full max-w-sm"
-                  >
-                    <Link
-                      href={link.path}
-                      className={`block w-full text-center py-4 rounded-2xl text-xl font-bold transition-all shadow-sm ${
-                        isActive
-                          ? "bg-blue-600 text-white shadow-blue-500/25 border border-blue-600"
-                          : "bg-white border border-slate-200 text-slate-700 hover:border-slate-300 active:scale-95"
-                      }`}
-                    >
-                      {link.name}
-                    </Link>
-                  </motion.div>
-                );
-              })}
+              ))}
             </div>
-            
-            {/* Ambient Footer Text */}
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
-              transition={{ delay: 0.4 }}
-              className="absolute bottom-12 text-slate-400 font-syne text-sm font-bold tracking-widest uppercase"
-            >
-              Arpan Singh • Portfolio
-            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

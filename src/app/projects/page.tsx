@@ -11,10 +11,10 @@ const categories = ["All", "Web", "Python", "App", "UI/UX Design", "Other"];
 // Helper to assign a relevant icon based on category
 const getCategoryIcon = (category: string) => {
   switch(category?.toLowerCase()) {
-    case "web": return <LayoutTemplate size={80} className="text-blue-600/10 pointer-events-none group-hover:scale-110 transition-transform duration-500" />;
-    case "python": return <Code2 size={80} className="text-purple-600/10 pointer-events-none group-hover:scale-110 transition-transform duration-500" />;
-    case "app": return <Smartphone size={80} className="text-cyan-600/10 pointer-events-none group-hover:scale-110 transition-transform duration-500" />;
-    default: return <Database size={80} className="text-emerald-600/10 pointer-events-none group-hover:scale-110 transition-transform duration-500" />;
+    case "web": return <LayoutTemplate size={80} className="text-blue-600/10 pointer-events-none transition-transform duration-500" />;
+    case "python": return <Code2 size={80} className="text-purple-600/10 pointer-events-none transition-transform duration-500" />;
+    case "app": return <Smartphone size={80} className="text-cyan-600/10 pointer-events-none transition-transform duration-500" />;
+    default: return <Database size={80} className="text-emerald-600/10 pointer-events-none transition-transform duration-500" />;
   }
 };
 
@@ -41,7 +41,6 @@ export default function Projects() {
     activeCategory === "All" ? true : project.category === activeCategory
   );
 
-  // FIX: Explicitly type the variants
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -78,7 +77,7 @@ export default function Projects() {
               <button
                 key={category}
                 onClick={() => setActiveCategory(category)}
-                className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 ${
+                className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 cursor-pointer ${
                   activeCategory === category
                     ? "bg-slate-900 text-white shadow-md"
                     : "text-slate-600 hover:bg-white hover:text-slate-900 hover:shadow-sm"
@@ -106,7 +105,7 @@ export default function Projects() {
                   initial="hidden"
                   animate="show"
                   exit="exit"
-                  className="group bg-white/80 backdrop-blur-xl rounded-[2rem] border-2 border-white/80 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all flex flex-col h-[400px]"
+                  className="bg-white/80 backdrop-blur-xl rounded-[2rem] border-2 border-white/80 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-1 transition-all flex flex-col h-[400px]"
                 >
                   <div className="h-10 bg-slate-100/80 backdrop-blur-md flex items-center px-4 gap-2 border-b border-slate-200 relative shrink-0">
                     <div className="flex gap-2">
@@ -119,7 +118,7 @@ export default function Projects() {
                     </div>
                   </div>
 
-                  <div className="h-32 bg-slate-50 p-6 flex items-end relative overflow-hidden shrink-0 border-b border-slate-100">
+                  <div className="h-32 bg-slate-50 p-6 flex items-end relative overflow-hidden shrink-0 border-b border-slate-100 group">
                     {/* If there's an image uploaded from admin, show it as background */}
                     {project.imageUrl ? (
                        <img src={project.imageUrl} alt={project.title} className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
@@ -163,12 +162,12 @@ export default function Projects() {
                         <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{project.category}</span>
                         <div className="flex gap-2">
                           {project.githubUrl && (
-                            <a href={project.githubUrl} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:border-slate-400 hover:shadow-sm transition-all" title="View Repository">
+                            <a href={project.githubUrl} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:border-slate-400 hover:shadow-sm transition-all cursor-pointer" title="View Repository">
                               <GitBranch size={14} />
                             </a>
                           )}
                           {project.liveUrl && (
-                            <a href={project.liveUrl} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-600 hover:border-blue-400 hover:shadow-sm transition-all" title="View Live Project">
+                            <a href={project.liveUrl} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-blue-600 hover:border-blue-400 hover:shadow-sm transition-all cursor-pointer" title="View Live Project">
                               <ExternalLink size={14} />
                             </a>
                           )}
@@ -183,7 +182,7 @@ export default function Projects() {
         )}
 
         {!isLoading && filteredProjects.length === 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full py-20 flex flex-col items-center justify-center bg-white/60 backdrop-blur-xl rounded-[2rem] border-2 border-white/80 mt-6">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full py-20 flex flex-col items-center justify-center bg-white/60 backdrop-blur-xl rounded-[2rem] border-2 border-white/80 mt-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <FolderGit2 size={48} className="text-slate-300 mb-4" />
             <h3 className="font-syne text-2xl font-bold text-slate-900 mb-2">No projects found</h3>
             <p className="text-slate-500">Try selecting a different category filter.</p>

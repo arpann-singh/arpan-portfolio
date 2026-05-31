@@ -47,10 +47,10 @@ export default function Home() {
   // Fetch Featured Data from Firebase
   useEffect(() => {
     const unsubProjects = onSnapshot(query(collection(db, "custom_projects"), where("featured", "==", true)), (snap) => {
-      setFeaturedProjects(snap.docs.map(d => ({ id: d.id, ...d.data() })).slice(0, 2)); 
+      setFeaturedProjects(snap.docs.map(d => ({ id: d.id, ...d.data() })).slice(0, 2));
     });
     const unsubCerts = onSnapshot(query(collection(db, "certifications"), where("featured", "==", true)), (snap) => {
-      setFeaturedCerts(snap.docs.map(d => ({ id: d.id, ...d.data() })).slice(0, 2)); 
+      setFeaturedCerts(snap.docs.map(d => ({ id: d.id, ...d.data() })).slice(0, 2));
     });
     return () => { unsubProjects(); unsubCerts(); };
   }, []);
@@ -157,15 +157,30 @@ export default function Home() {
             <motion.p className="text-blue-600 font-bold tracking-widest uppercase mb-4 sm:mb-6 text-xs sm:text-sm flex items-center gap-2 sm:gap-3 relative z-10">
               <span className="h-[3px] w-8 bg-blue-600 inline-block rounded-full"></span> Welcome to my digital space 🚀
             </motion.p>
-            <h1 ref={heroTextRef} className="font-syne text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl font-extrabold tracking-tighter leading-[1.05] sm:leading-[1.1] mb-6 relative z-10 text-slate-900 break-words">
-              <span className="inline-block">I'm</span>{" "}
-              <span className="inline-block"><span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600">Arpan</span></span> <br />
-              <span className="inline-block"><span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-500 to-cyan-500">Singh.</span></span>
+            <h1
+              ref={heroTextRef}
+              className="font-syne text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl font-extrabold tracking-tighter leading-[1.05] sm:leading-[1.1] mb-6 relative z-10 text-slate-900 break-words"
+            >
+              <span className="inline-block">I'm an</span>{" "}
+              <span className="inline-block min-w-[280px] text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600">
+                <motion.span
+                  key={currentRole}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {roles[currentRole]}
+                </motion.span>
+              </span>
             </h1>
-            <div className="h-10 sm:h-12 lg:h-14 xl:h-16 mb-2 sm:mb-4 relative z-10">
-              <motion.p key={currentRole} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.4, type: "spring" }} className="text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-sans text-slate-700 font-medium">
-                Building the future as a <span className="text-blue-600 font-bold">{roles[currentRole]}</span>
-              </motion.p>
+            <div className="mb-2 sm:mb-4 relative z-10">
+              <p className="text-lg sm:text-xl md:text-2xl text-slate-600 font-medium max-w-2xl">
+                Merging{" "}
+                <span className="text-blue-600 font-semibold">complex logic</span>{" "}
+                with{" "}
+                <span className="text-blue-600 font-semibold">elegant design</span>.
+              </p>
             </div>
           </motion.div>
 
@@ -356,9 +371,9 @@ export default function Home() {
           </motion.div>
 
           {featuredProjects.length === 0 ? (
-             <div className="w-full p-12 text-center bg-white/50 rounded-[2rem] border-2 border-dashed border-slate-300 font-bold text-slate-400">
-               Add starred projects in the Admin Panel to display them here.
-             </div>
+            <div className="w-full p-12 text-center bg-white/50 rounded-[2rem] border-2 border-dashed border-slate-300 font-bold text-slate-400">
+              Add starred projects in the Admin Panel to display them here.
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-8">
               {featuredProjects.map((project, i) => (
@@ -413,9 +428,9 @@ export default function Home() {
             </div>
 
             {featuredCerts.length === 0 ? (
-               <div className="w-full py-8 text-center bg-white/50 rounded-2xl border border-dashed border-slate-300 font-bold text-slate-400">
-                 Star certifications in the Admin Panel to display them here.
-               </div>
+              <div className="w-full py-8 text-center bg-white/50 rounded-2xl border border-dashed border-slate-300 font-bold text-slate-400">
+                Star certifications in the Admin Panel to display them here.
+              </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {featuredCerts.map((cert) => (
