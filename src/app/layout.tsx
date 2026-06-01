@@ -9,6 +9,7 @@ import DevModeWrapper from "@/components/DevModeWrapper";
 import DevModeToggle from "@/components/DevModeToggle";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import ThemeToggle from "@/components/ThemeToggle";
+import CommandPalette from "@/components/CommandPalette"; // <-- Added Command Palette
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const syne = Syne({ subsets: ["latin"], variable: "--font-syne" });
@@ -54,13 +55,14 @@ export default function RootLayout({
             <DevModeWrapper>
               <CustomCursor />
               <Navbar />
+              <CommandPalette /> {/* <-- Rendered globally */}
               <main className="flex-grow flex flex-col relative">
                 {children}
               </main>
               <Footer />
             </DevModeWrapper>
             <DevModeToggle />
-            <ThemeToggle /> {/* <-- The new toggle button */}
+            <ThemeToggle />
           </DevModeProvider>
         </ThemeProvider>
       </body>

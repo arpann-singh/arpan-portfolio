@@ -45,7 +45,7 @@ export default function Skills() {
 
   return (
     <div className="flex flex-col min-h-screen relative w-full overflow-hidden bg-slate-50 pt-32 pb-20">
-      
+
       {/* BACKGROUND ORBS */}
       <div className="fixed top-[-10%] left-[-5%] w-[400px] h-[400px] bg-blue-200/40 rounded-full blur-[100px] pointer-events-none z-0" />
       <div className="fixed bottom-[-10%] right-[-5%] w-[400px] h-[400px] bg-indigo-200/40 rounded-full blur-[100px] pointer-events-none z-0" />
@@ -62,9 +62,25 @@ export default function Skills() {
         </motion.div>
 
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20 opacity-50">
-            <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4" />
-            <p className="text-slate-600 font-sans font-medium">Loading skill metrics...</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-white/40 p-8 md:p-10 rounded-[2rem] border-2 border-white shadow-sm">
+                {/* Title Skeleton */}
+                <div className="h-8 w-1/3 bg-slate-200/60 rounded-full mb-8 animate-pulse"></div>
+                {/* Skill Bars Skeleton */}
+                <div className="space-y-6">
+                  {[1, 2, 3].map((j) => (
+                    <div key={j}>
+                      <div className="flex justify-between mb-2">
+                        <div className="h-4 w-1/4 bg-slate-200/60 rounded-full animate-pulse"></div>
+                        <div className="h-4 w-8 bg-slate-200/60 rounded-full animate-pulse"></div>
+                      </div>
+                      <div className="h-3 w-full bg-slate-100 rounded-full"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         ) : Object.keys(groupedSkills).length === 0 ? (
           <div className="bg-white/60 backdrop-blur-xl p-12 rounded-[2rem] border-2 border-white text-center max-w-2xl mx-auto shadow-sm">
@@ -74,7 +90,7 @@ export default function Skills() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {Object.entries(groupedSkills).map(([category, categorySkills], index) => (
-              <motion.div 
+              <motion.div
                 key={category}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -91,7 +107,7 @@ export default function Skills() {
                         <span className="font-mono text-sm font-bold text-blue-600">{skill.level}%</span>
                       </div>
                       <div className="h-3 w-full bg-slate-200/60 rounded-full overflow-hidden shadow-inner">
-                        <motion.div 
+                        <motion.div
                           initial={{ width: 0 }}
                           whileInView={{ width: `${skill.level}%` }}
                           viewport={{ once: true }}
