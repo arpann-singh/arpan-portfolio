@@ -86,7 +86,7 @@ export default function About() {
             <div className="relative pl-4 border-l-2 border-cyan-100 space-y-10">
               <div className="relative">
                 <div className="absolute -left-[25px] top-1 w-4 h-4 rounded-full bg-white border-4 border-cyan-500 shadow-sm"></div>
-                <h3 className="font-bold text-slate-900 text-lg">President & Content Lead</h3>
+                <h3 className="font-bold text-slate-900 text-lg">Technical & Content Lead</h3>
                 <p className="text-cyan-600 font-bold text-sm mb-2">Swaang Drama Club • SSTC</p>
                 <p className="text-slate-600 font-sans text-sm leading-relaxed">Facilitating ad script writing, video shooting, and editing. Leading the creative direction and technical deployment (like the Swaang Connect platform) for club initiatives.</p>
               </div>
