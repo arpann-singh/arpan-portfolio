@@ -121,17 +121,17 @@ export default function About() {
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-colors">
                   <Gamepad2 className="w-8 h-8 text-emerald-400 mb-4" />
                   <h3 className="font-bold mb-1">Sim Driver</h3>
-                  <p className="text-sm text-slate-400">Euro Truck Simulator 2 & Rigs of Rods.</p>
+                  <p className="text-sm text-slate-400">Euro Truck Simulator 2 & Forza Horizon.</p>
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-colors">
                   <Plane className="w-8 h-8 text-cyan-400 mb-4" />
                   <h3 className="font-bold mb-1">Explorer</h3>
-                  <p className="text-sm text-slate-400">Indian railways & planning Vietnam.</p>
+                  <p className="text-sm text-slate-400">Exploring places & Planning to travel abroad.</p>
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-colors">
                   <MapPin className="w-8 h-8 text-amber-400 mb-4" />
                   <h3 className="font-bold mb-1">Local Rider</h3>
-                  <p className="text-sm text-slate-400">Scooter rides around Bhilai.</p>
+                  <p className="text-sm text-slate-400">Scooter rides around my city.</p>
                 </div>
               </div>
             </div>
