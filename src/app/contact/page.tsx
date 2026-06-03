@@ -34,7 +34,7 @@ export default function Contact() {
   const onSubmit = async (data: ContactFormValues) => {
     setIsSubmitting(true);
     setErrorMessage("");
-    
+
     try {
       await addDoc(collection(db, "messages"), {
         name: data.name,
@@ -46,7 +46,7 @@ export default function Contact() {
 
       setIsSuccess(true);
       reset();
-      
+
       setTimeout(() => setIsSuccess(false), 5000);
     } catch (error) {
       console.error("Error sending message:", error);
@@ -58,14 +58,14 @@ export default function Contact() {
 
   return (
     <div className="flex flex-col min-h-screen relative w-full overflow-hidden bg-slate-50 pt-32 pb-20">
-      
+
       {/* BACKGROUND ORBS */}
       <div className="fixed top-[-10%] left-[-5%] w-[400px] h-[400px] bg-blue-200/40 rounded-full blur-[100px] pointer-events-none z-0" />
       <div className="fixed bottom-[-10%] right-[-5%] w-[400px] h-[400px] bg-indigo-200/40 rounded-full blur-[100px] pointer-events-none z-0" />
 
       <section className="relative z-10 px-6 container mx-auto max-w-6xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          
+
           {/* Left Side: Contact Info */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -97,7 +97,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <p className="text-sm font-bold text-slate-400 mb-1 tracking-widest uppercase">Phone</p>
-                  <a href="tel:+917987755520" className="text-xl font-bold text-slate-900 hover:text-blue-600 transition-colors">+91 7987755520</a>
+                  <a href="" className="text-xl font-bold text-slate-900 hover:text-blue-600 transition-colors">Contact Me thorugh Email</a>
                 </div>
               </div>
 
@@ -121,17 +121,17 @@ export default function Contact() {
             className="bg-white/60 backdrop-blur-3xl p-8 md:p-12 rounded-[2.5rem] border-2 border-white shadow-[0_8px_30px_rgb(0,0,0,0.06)] relative overflow-hidden"
           >
             {isSuccess && (
-               <motion.div 
-                 initial={{ opacity: 0, scale: 0.9 }} 
-                 animate={{ opacity: 1, scale: 1 }} 
-                 className="absolute inset-0 bg-white/95 backdrop-blur-xl flex flex-col items-center justify-center text-center p-8 z-20"
-               >
-                 <div className="w-20 h-20 bg-green-100 border-2 border-green-200 text-green-600 rounded-[2rem] flex items-center justify-center mb-6 shadow-sm">
-                   <Send size={40} />
-                 </div>
-                 <h3 className="font-syne text-3xl font-bold text-slate-900 mb-2">Message Delivered!</h3>
-                 <p className="text-slate-600 font-medium">It has been securely routed to my admin dashboard. I'll get back to you shortly.</p>
-               </motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="absolute inset-0 bg-white/95 backdrop-blur-xl flex flex-col items-center justify-center text-center p-8 z-20"
+              >
+                <div className="w-20 h-20 bg-green-100 border-2 border-green-200 text-green-600 rounded-[2rem] flex items-center justify-center mb-6 shadow-sm">
+                  <Send size={40} />
+                </div>
+                <h3 className="font-syne text-3xl font-bold text-slate-900 mb-2">Message Delivered!</h3>
+                <p className="text-slate-600 font-medium">It has been securely routed to my admin dashboard. I'll get back to you shortly.</p>
+              </motion.div>
             )}
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 relative z-10">
@@ -147,9 +147,8 @@ export default function Contact() {
                   id="name"
                   type="text"
                   {...register("name")}
-                  className={`w-full px-5 py-4 bg-white/80 border-2 rounded-2xl focus:outline-none focus:ring-4 transition-all shadow-sm ${
-                    errors.name ? "border-red-400 focus:ring-red-100" : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"
-                  }`}
+                  className={`w-full px-5 py-4 bg-white/80 border-2 rounded-2xl focus:outline-none focus:ring-4 transition-all shadow-sm ${errors.name ? "border-red-400 focus:ring-red-100" : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"
+                    }`}
                   placeholder="John Doe"
                 />
                 {errors.name && <p className="text-red-500 text-sm font-bold mt-2 ml-2">{errors.name.message}</p>}
@@ -161,9 +160,8 @@ export default function Contact() {
                   id="email"
                   type="email"
                   {...register("email")}
-                  className={`w-full px-5 py-4 bg-white/80 border-2 rounded-2xl focus:outline-none focus:ring-4 transition-all shadow-sm ${
-                    errors.email ? "border-red-400 focus:ring-red-100" : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"
-                  }`}
+                  className={`w-full px-5 py-4 bg-white/80 border-2 rounded-2xl focus:outline-none focus:ring-4 transition-all shadow-sm ${errors.email ? "border-red-400 focus:ring-red-100" : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"
+                    }`}
                   placeholder="john@example.com"
                 />
                 {errors.email && <p className="text-red-500 text-sm font-bold mt-2 ml-2">{errors.email.message}</p>}
@@ -175,9 +173,8 @@ export default function Contact() {
                   id="message"
                   rows={5}
                   {...register("message")}
-                  className={`w-full px-5 py-4 bg-white/80 border-2 rounded-2xl focus:outline-none focus:ring-4 transition-all resize-none shadow-sm ${
-                    errors.message ? "border-red-400 focus:ring-red-100" : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"
-                  }`}
+                  className={`w-full px-5 py-4 bg-white/80 border-2 rounded-2xl focus:outline-none focus:ring-4 transition-all resize-none shadow-sm ${errors.message ? "border-red-400 focus:ring-red-100" : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"
+                    }`}
                   placeholder="How can I help you?"
                 />
                 {errors.message && <p className="text-red-500 text-sm font-bold mt-2 ml-2">{errors.message.message}</p>}
