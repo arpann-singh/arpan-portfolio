@@ -5,10 +5,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import gsap from "gsap";
-import { 
-  ArrowRight, Code2, Database, LayoutTemplate, User, 
-  Briefcase, Award, Send, FileText, MapPin, Terminal, 
-  Disc, Star 
+import {
+  ArrowRight, Code2, Database, LayoutTemplate, User,
+  Briefcase, Award, Send, FileText, MapPin, Terminal,
+  Disc, Star
 } from "lucide-react";
 import ApertureWidget from "@/components/ApertureWidget";
 import { db } from "@/lib/firebase";
@@ -20,13 +20,13 @@ const TiltCard = ({ children, className, ...rest }: any) => {
   const y = useMotionValue(0);
   const mouseXSpring = useSpring(x, { stiffness: 300, damping: 30 });
   const mouseYSpring = useSpring(y, { stiffness: 300, damping: 30 });
-  
+
   const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["5deg", "-5deg"]);
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-5deg", "5deg"]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (window.matchMedia("(pointer: coarse)").matches) return;
-    
+
     const rect = e.currentTarget.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
@@ -60,7 +60,7 @@ const roles = [
   { text: "an IT Student", emoji: "🎓" },
   { text: "a Developer", emoji: "🐍" },
   { text: "a UI/UX Designer", emoji: "🎨" },
-  { text: "a GDSC Member", emoji: "💡" },
+  { text: "a GDG Member", emoji: "💻" },
 ];
 
 const SectionDivider = () => (
@@ -130,7 +130,7 @@ export default function Home() {
         } else {
           setSpotifyData({ isPlaying: false, song: "Not Playing", artist: "Spotify", coverUrl: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=200&auto=format&fit=crop" });
         }
-      } catch (error) {}
+      } catch (error) { }
     };
     fetchSpotify();
     const interval = setInterval(fetchSpotify, 10000);
@@ -138,9 +138,9 @@ export default function Home() {
   }, []);
 
   const timeString = time ? time.toLocaleTimeString("en-US", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "Syncing...";
-  let statusText = "Available for freelance"; 
+  let statusText = "Available for freelance";
   let statusIcon = "🟢";
-  
+
   if (time) {
     const hour = parseInt(time.toLocaleTimeString("en-US", { timeZone: "Asia/Kolkata", hour12: false, hour: "numeric" }));
     if (hour >= 0 && hour < 6) { statusText = "Late night coding"; statusIcon = "☕"; }
@@ -148,17 +148,17 @@ export default function Home() {
     else if (hour >= 12 && hour < 18) { statusText = "Deep in architecture"; statusIcon = "💻"; }
   }
 
-  const sectionReveal = { 
-    initial: { opacity: 0, y: 30 }, 
-    whileInView: { opacity: 1, y: 0 }, 
-    viewport: { once: true, margin: "-20px" }, 
-    transition: { duration: 0.7, ease: "easeOut" as const } 
+  const sectionReveal = {
+    initial: { opacity: 0, y: 30 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true, margin: "-20px" },
+    transition: { duration: 0.7, ease: "easeOut" as const }
   };
 
   return (
     <div className="flex flex-col min-h-screen relative w-full max-w-[100vw] overflow-x-hidden overflow-y-auto bg-slate-100 pb-20 sm:pb-32">
-      
-      <div 
+
+      <div
         className="fixed inset-0 z-50 pointer-events-none opacity-[0.04] mix-blend-overlay"
         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
       ></div>
@@ -172,21 +172,21 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 auto-rows-fr max-w-7xl mx-auto w-full min-w-0">
 
           {/* MAIN WELCOME CARD */}
-          <TiltCard 
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} 
+          <TiltCard
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
             className="col-span-1 md:col-span-2 lg:col-span-3 bg-white/60 backdrop-blur-3xl rounded-[2rem] p-6 sm:p-8 lg:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border-2 border-white/80 flex flex-col justify-center relative group cursor-default overflow-hidden h-full min-w-0"
           >
             <motion.p className="text-blue-600 font-bold tracking-widest uppercase mb-4 text-[10px] sm:text-xs flex items-center gap-2 sm:gap-3 relative z-10">
               <span className="h-[3px] w-6 sm:w-8 bg-blue-600 inline-block rounded-full"></span> Welcome to my digital space 🚀
             </motion.p>
-            
+
             <h1 ref={heroTextRef} className="font-syne text-[2rem] leading-[1.1] sm:text-5xl md:text-5xl lg:text-[3.25rem] xl:text-6xl font-extrabold tracking-tighter mb-4 relative z-10 text-slate-900 pointer-events-none break-words whitespace-normal">
               <span className="block mb-1 sm:mb-2 text-slate-800">I'm</span>
               <div className="min-h-[2.5em] sm:min-h-[1.3em] flex items-center mt-1 w-full max-w-full">
                 <AnimatePresence mode="wait">
-                  <motion.div 
-                    key={currentRole} 
-                    initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }} 
+                  <motion.div
+                    key={currentRole}
+                    initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3 }}
                     className="flex flex-wrap items-center gap-2 sm:gap-3 lg:gap-4 max-w-full"
                   >
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 pb-1 pr-2 break-words whitespace-normal">
@@ -208,8 +208,8 @@ export default function Home() {
           </TiltCard>
 
           {/* PHOTO CARD */}
-          <TiltCard 
-            initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }} 
+          <TiltCard
+            initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
             className="col-span-1 md:col-span-1 lg:col-span-1 lg:row-span-2 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-4 border-white overflow-hidden relative min-h-[300px] sm:min-h-[350px] lg:min-h-0 h-full w-full group min-w-0"
           >
             <div className="absolute inset-0 w-full h-full min-w-0">
@@ -226,8 +226,8 @@ export default function Home() {
           </TiltCard>
 
           {/* APERTURE WIDGET */}
-          <TiltCard 
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} 
+          <TiltCard
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
             className="col-span-1 md:col-span-1 lg:col-span-1 relative min-h-[200px] sm:min-h-[220px] lg:min-h-0 h-full w-full min-w-0"
           >
             <div className="w-full h-full overflow-hidden flex items-center justify-center min-w-0">
@@ -236,8 +236,8 @@ export default function Home() {
           </TiltCard>
 
           {/* SPOTIFY BENTO */}
-          <TiltCard 
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }} 
+          <TiltCard
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}
             className="col-span-1 md:col-span-1 lg:col-span-1 bg-white/60 backdrop-blur-3xl rounded-[2rem] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border-2 border-white/80 flex flex-col justify-between relative overflow-hidden group cursor-default h-full w-full min-w-0"
           >
             <div className="absolute top-0 right-0 w-32 h-32 bg-green-400/20 rounded-full blur-[40px] pointer-events-none group-hover:bg-green-400/30 transition-colors duration-500"></div>
@@ -246,7 +246,7 @@ export default function Home() {
               <h3 className="font-syne text-2xl sm:text-3xl font-bold text-slate-900 mb-1 tracking-tight truncate">{timeString}</h3>
               <p className="text-slate-600 font-sans text-xs sm:text-sm font-bold truncate">{statusText}</p>
             </div>
-            
+
             <div className="mt-4 pt-4 border-t border-slate-200/60 flex items-center gap-3 relative z-10 pointer-events-none">
               <div className="relative w-10 h-10 rounded-full border border-slate-200 bg-white flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
                 <div className={`absolute inset-0 ${spotifyData.isPlaying ? 'animate-[spin_4s_linear_infinite]' : ''}`}><Image src={spotifyData.coverUrl} fill alt="Album Art" className="object-cover" /></div>
@@ -277,7 +277,7 @@ export default function Home() {
                 <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-blue-600 transition-colors shrink-0"><ArrowRight size={18} /></div>
               </div>
             </TiltCard>
-            
+
             <TiltCard initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }} className="h-[60px] sm:h-[72px] shrink-0 bg-white/80 backdrop-blur-3xl rounded-[2rem] p-4 sm:p-5 border-2 border-white/80 text-slate-800 font-bold flex items-center justify-center gap-2 hover:bg-white transition-colors shadow-sm w-full block relative min-w-0">
               <a href="/resume.pdf" download className="absolute inset-0 w-full h-full z-20"></a>
               <div className="flex items-center justify-center gap-2 pointer-events-none text-sm sm:text-base"><FileText size={18} className="text-slate-500 shrink-0" /> <span className="truncate">Download CV</span></div>
@@ -293,10 +293,10 @@ export default function Home() {
       <section className="relative z-20 py-8">
         <div className="container mx-auto px-4 sm:px-6 md:px-10 lg:px-16 max-w-7xl min-w-0">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 min-w-0">
-            {[ 
-              { title: "Backend Magic 🔮", icon: <Database className="text-cyan-500 w-8 h-8 sm:w-10 sm:h-10 mb-3 sm:mb-4 shrink-0" />, desc: "Python, Firebase, Node.js" }, 
-              { title: "Pixel Perfect UI ✨", icon: <LayoutTemplate className="text-indigo-500 w-8 h-8 sm:w-10 sm:h-10 mb-3 sm:mb-4 shrink-0" />, desc: "Next.js, TypeScript, Figma" }, 
-              { title: "AI Innovation 🤖", icon: <Code2 className="text-blue-500 w-8 h-8 sm:w-10 sm:h-10 mb-3 sm:mb-4 shrink-0" />, desc: "Generative AI, Prompt Engineering" } 
+            {[
+              { title: "Backend Magic 🔮", icon: <Database className="text-cyan-500 w-8 h-8 sm:w-10 sm:h-10 mb-3 sm:mb-4 shrink-0" />, desc: "Python, Firebase, Node.js" },
+              { title: "Pixel Perfect UI ✨", icon: <LayoutTemplate className="text-indigo-500 w-8 h-8 sm:w-10 sm:h-10 mb-3 sm:mb-4 shrink-0" />, desc: "Next.js, TypeScript, Figma" },
+              { title: "AI Innovation 🤖", icon: <Code2 className="text-blue-500 w-8 h-8 sm:w-10 sm:h-10 mb-3 sm:mb-4 shrink-0" />, desc: "Generative AI, Prompt Engineering" }
             ].map((skill, i) => (
               <TiltCard key={i} {...sectionReveal} transition={{ delay: i * 0.1, duration: 0.5 }} className="p-6 sm:p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl border-2 border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] group cursor-default min-w-0">
                 {skill.icon}
@@ -320,7 +320,7 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6 md:px-10 lg:px-16 max-w-7xl min-w-0">
           <TiltCard {...sectionReveal} className="bg-white/60 backdrop-blur-xl rounded-[2.5rem] p-6 sm:p-10 lg:p-16 border-2 border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden min-w-0">
             <div className="absolute -left-32 -top-32 w-96 h-96 bg-blue-100/50 rounded-full blur-[80px] pointer-events-none"></div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-14 items-center relative z-10 min-w-0">
               <div className="flex flex-col justify-center text-left items-start min-w-0">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-blue-100/50 border border-blue-200 text-blue-700 font-bold text-[10px] sm:text-xs mb-4 sm:mb-6 shadow-sm">
@@ -336,11 +336,11 @@ export default function Home() {
                   Read Full Story
                 </Link>
               </div>
-              
+
               <div className="relative min-h-[300px] md:min-h-[350px] lg:min-h-[400px] w-full rounded-[2rem] flex flex-col overflow-hidden group bg-white shadow-xl border border-slate-200 pointer-events-none min-w-0">
                 <div className="absolute top-0 right-0 w-40 h-40 md:w-64 md:h-64 bg-cyan-400/10 rounded-full blur-[40px] md:blur-[60px] pointer-events-none transition-colors duration-700"></div>
                 <div className="absolute bottom-0 left-0 w-40 h-40 md:w-64 md:h-64 bg-purple-400/10 rounded-full blur-[40px] md:blur-[60px] pointer-events-none transition-colors duration-700"></div>
-                
+
                 <div className="flex-1 w-full h-full bg-transparent flex flex-col overflow-hidden relative z-10 min-w-0">
                   <div className="h-10 md:h-12 bg-slate-50/80 backdrop-blur-md border-b border-slate-200 flex items-center px-4 md:px-6 gap-1.5 sm:gap-2 shrink-0 w-full">
                     <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-[#ff5f56] shrink-0"></div>
@@ -350,14 +350,14 @@ export default function Home() {
                       <Terminal size={14} className="text-slate-400 hidden sm:block shrink-0" /> developer.py
                     </span>
                   </div>
-                  
+
                   <div className="p-4 sm:p-6 md:p-8 font-mono text-[10px] sm:text-xs md:text-sm lg:text-base leading-loose overflow-x-auto text-slate-700 relative z-10 flex flex-col justify-center h-full w-full min-w-0">
                     <div className="flex gap-2 whitespace-nowrap min-w-max">
                       <span className="text-blue-600 font-bold">class</span><span className="text-amber-600">Developer</span><span className="text-slate-500">() :</span>
                     </div>
                     <div className="pl-4 md:pl-8 flex flex-col mt-2 min-w-max">
                       <div className="flex gap-2 whitespace-nowrap"><span className="text-blue-600">def</span> <span className="text-indigo-600">__init__</span><span className="text-slate-500">(self):</span></div>
-                      
+
                       <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={{ hidden: { opacity: 1 }, visible: { transition: { staggerChildren: 0.15 } } }} className="pl-4 md:pl-8 flex flex-col mt-1 sm:mt-2 gap-1 sm:gap-1.5">
                         <motion.span variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="whitespace-nowrap"><span className="text-blue-500">self</span>.name = <span className="text-emerald-600">"Arpan Singh"</span></motion.span>
                         <motion.span variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }} className="whitespace-nowrap"><span className="text-blue-500">self</span>.role = <span className="text-emerald-600">"Backend & UI/UX"</span></motion.span>
@@ -392,7 +392,7 @@ export default function Home() {
               View All Repos <ArrowRight size={18} className="shrink-0" />
             </Link>
           </motion.div>
-          
+
           {featuredProjects.length === 0 ? (
             <div className="w-full p-8 sm:p-12 text-center bg-white/50 rounded-[2rem] border-2 border-dashed border-slate-300 font-bold text-slate-400 text-sm sm:text-base">
               Add starred projects in the Admin Panel to display them here.
@@ -401,7 +401,7 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 lg:gap-10 min-w-0">
               {featuredProjects.map((project, i) => (
                 <TiltCard key={project.id} {...sectionReveal} transition={{ delay: i * 0.1 }} className="group bg-white/80 backdrop-blur-xl rounded-[2rem] border-2 border-white/80 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300 flex flex-col cursor-pointer min-w-0">
-                  
+
                   {/* Dynamic Mac Header */}
                   <div className="h-8 sm:h-10 bg-slate-100/80 backdrop-blur-md flex items-center px-4 sm:px-6 gap-1.5 sm:gap-2 border-b border-slate-200 relative w-full z-20">
                     <div className="flex gap-1.5 sm:gap-2 absolute left-4 sm:left-6">
@@ -413,7 +413,7 @@ export default function Home() {
                       <Code2 size={12} className="hidden sm:block" /> {project.title.toLowerCase().replace(/\s+/g, '-')}.ts
                     </div>
                   </div>
-                  
+
                   {/* Full Vibrancy Image Banner */}
                   <div className="h-48 sm:h-56 lg:h-64 bg-slate-100 relative overflow-hidden w-full border-b border-slate-100">
                     <div className="absolute inset-0 bg-[linear-gradient(to_right,#0000000a_1px,transparent_1px),linear-gradient(to_bottom,#0000000a_1px,transparent_1px)] bg-[size:14px_24px] z-10 pointer-events-none"></div>
@@ -423,7 +423,7 @@ export default function Home() {
                       <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 sm:w-40 sm:h-40 rounded-full pointer-events-none blur-[40px] sm:blur-[50px] ${i % 2 === 0 ? 'bg-cyan-400/20' : 'bg-purple-400/20'}`}></div>
                     )}
                   </div>
-                  
+
                   {/* Clean Content Area */}
                   <div className="p-6 sm:p-8 bg-white flex-1 flex flex-col min-w-0 z-20 pointer-events-none">
                     <div className="flex justify-between items-start mb-3 sm:mb-4 gap-4">
@@ -472,7 +472,7 @@ export default function Home() {
                 View Full Vault
               </Link>
             </div>
-            
+
             {featuredCerts.length === 0 ? (
               <div className="w-full py-8 text-center bg-white/50 rounded-2xl border border-dashed border-slate-300 font-bold text-slate-400 text-sm sm:text-base">
                 Star certifications in the Admin Panel to display them here.
@@ -502,7 +502,7 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6 md:px-10 lg:px-16 max-w-7xl min-w-0">
           <motion.div {...sectionReveal} className="bg-slate-900 text-white rounded-[2.5rem] sm:rounded-[3rem] p-8 sm:p-10 md:p-16 lg:p-20 text-center shadow-2xl relative overflow-hidden min-w-0">
             <div className="absolute top-0 right-0 w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] bg-blue-600/20 rounded-full blur-[80px] sm:blur-[100px] pointer-events-none"></div>
-            
+
             <div className="relative z-10 max-w-3xl mx-auto min-w-0">
               <h2 className="font-syne text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight break-words whitespace-normal w-full">Ready to collaborate?</h2>
               <p className="text-slate-400 text-sm sm:text-base md:text-lg mb-8 sm:mb-10 px-4 sm:px-0 break-words whitespace-normal w-full">
